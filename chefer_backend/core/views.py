@@ -18,3 +18,5 @@ def menu(request):
 def team(request):
     return render(request, 'team.html')
 
+
+
