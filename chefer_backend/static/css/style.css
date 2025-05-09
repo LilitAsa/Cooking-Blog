@@ -91,6 +91,7 @@ h6,
     color: var(--bs-primary);
 }
 
+
 @media (max-width: 991.98px) {
     .navbar-dark .navbar-nav .nav-link {
         margin-right: 0;
