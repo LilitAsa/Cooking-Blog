@@ -14,15 +14,21 @@ def index(request):
         'team_members': team_members,
         'menus': menus,
         'blog_posts': blog_posts,
+        'page_title': 'Home',
+        'page_subtitle': 'Welcome to Chefer',
     }
     return render(request, 'index.html', context)
 
 
 def menu(request):
     categories = Category.objects.prefetch_related('menu_items').all()
-
+    features = Feature.objects.all()  
+    
     context = {
+        'page_title': 'Menu',       
         'categories': categories,
+        'page_title': 'Menu',
+        'features': features,
     }
     return render(request, 'menu.html', context)
 
@@ -57,6 +63,7 @@ def about(request):
     chefs = Chef.objects.all()
 
     context = {
+        'page_title': 'About',
         'chefs': chefs,
     }
     return render(request, 'about.html', context)
@@ -67,3 +74,10 @@ def contact(request):
         email = request.POST.get('email')
         message = request.POST.get('message')
     return render(request, 'contact.html')
+
+def feature_detail(request, pk):
+    feature = Feature.objects.get(pk=pk)
+    context = {
+        'feature': feature,
+    }
+    return render(request, 'feature_detail.html', context)

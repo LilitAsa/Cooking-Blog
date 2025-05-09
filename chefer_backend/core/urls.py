@@ -10,4 +10,5 @@ urlpatterns = [
     path('menu/', menu, name='menu'),
     path('team/', team, name='team'),
     path('testimonials/', testimonials, name='testimonials'),
+    path('feature/<int:pk>/', feature_detail, name='feature_detail'),
 ]

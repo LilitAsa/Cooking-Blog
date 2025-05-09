@@ -45,6 +45,18 @@
 
     {% include 'partials/header.html' %}
 
+    {% block hero %}
+    {% comment %} if template is index  
+    
+    {% endcomment %}
+    <div class="container-fluid p-5 mb-5 bg-dark text-secondary">
+        <div class="container wow fadeIn" data-wow-delay="0.1s">
+            <h1 class="display-1 text-secondary text-center mb-0">{{ page_title }}</h1>
+            <h6 class="display-1 text-secondary text-center mb-0 fs-2">{{ page_subtitle }}</h6>
+        </div>
+    </div>
+    {% endblock hero %}
+
     <!-- Main Content -->
     <main>
         {% block content %}{% endblock %}

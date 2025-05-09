@@ -1,0 +1,16 @@
+<!-- filepath: c:\Users\HOME\Desktop\practica projects\Chefer-1.0.0\chefer_backend\core\templates\feature_detail.html -->
+{% extends "base.html" %}
+{% block title %}{{ feature.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center">
+        <img class="img-fluid rounded-circle mb-4" src="{{ feature.image.url }}" alt="{{ feature.title }}" style="width: 200px; height: 200px;">
+        <h1 class="display-4">{{ feature.title }}</h1>
+        <p class="lead">{{ feature.description }}</p>
+        {% if feature.link %}
+        <a href="{{ feature.link }}" class="btn btn-primary">Visit External Link</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

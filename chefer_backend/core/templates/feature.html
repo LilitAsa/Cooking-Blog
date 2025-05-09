@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}
+{% block hero %}
     <!-- Hero Start -->
     <div class="container-fluid p-5 mb-5 bg-dark text-secondary">
         <div class="container wow fadeIn" data-wow-delay="0.1s">
@@ -10,8 +10,6 @@
     <!-- Hero End -->
 {% endblock %}
 {% block content %}
-
-    <!-- Feature Start -->
     <div class="container-fluid feature position-relative p-5 pb-0 mt-5">
         <div class="row g-5 gb-5">
             <div class="col-lg-4 col-md-6 wow fadeIn" data-wow-delay="0.1s">
@@ -50,6 +48,5 @@
             </div>
         </div>
     </div>
-    <!-- Feature End -->
-
+   {% include "partials/feature_part.html" %}
 {% endblock %}
