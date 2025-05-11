@@ -1,5 +1,8 @@
 from django.shortcuts import render
-from .models import Chef, Feature, Menu, Dish, BlogPost, Category, MenuItem, Testimonial, TeamMember
+from django.core.paginator import Paginator
+from django.core.cache import cache
+from .models import *
+  
 
 def index(request):
     features = Feature.objects.all()
@@ -7,6 +10,7 @@ def index(request):
     team_members = TeamMember.objects.all()
     menus = Menu.objects.prefetch_related('dishes').all()
     blog_posts = BlogPost.objects.all()[:3]  
+    
 
     context = {
         'features': features,
@@ -21,14 +25,24 @@ def index(request):
 
 
 def menu(request):
-    categories = Category.objects.prefetch_related('menu_items').all()
+    categories = cache.get('categories')
+    if not categories:
+        categories = Category.objects.prefetch_related('menu_items').all()
+        cache.set('categories', categories, 60 * 15)  # Кэш на 15 минут
     features = Feature.objects.all()  
+    paginator = Paginator(categories, 5) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     
     context = {
-        'page_title': 'Menu',       
-        'categories': categories,
+        'title': 'Menu',  
         'page_title': 'Menu',
+        'name': 'Our Menu',
+        'description' : "Explore our delicious menu",
+        'categories': page_obj,
         'features': features,
+        
     }
     return render(request, 'menu.html', context)
 
@@ -73,7 +87,17 @@ def contact(request):
         name = request.POST.get('name')
         email = request.POST.get('email')
         message = request.POST.get('message')
-    return render(request, 'contact.html')
+        
+    context = {
+        'page_title': 'Contact Us',
+        'page_subtitle': 'Get in touch with us',
+    }
+    if name and email and message:
+        print(f"Name: {name}, Email: {email}, Message: {message}")
+        context['success_message'] = 'Your message has been sent successfully!'
+    else:
+        context['error_message'] = 'Please fill in all fields.'
+    return render(request, 'contact.html', context)
 
 def feature_detail(request, pk):
     feature = Feature.objects.get(pk=pk)

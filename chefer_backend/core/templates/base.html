@@ -33,7 +33,6 @@
     <!-- Template Stylesheet -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
 
-    {% block extra_head %}{% endblock %}
 </head>
 
 <body>
@@ -46,9 +45,6 @@
     {% include 'partials/header.html' %}
 
     {% block hero %}
-    {% comment %} if template is index  
-    
-    {% endcomment %}
     <div class="container-fluid p-5 mb-5 bg-dark text-secondary">
         <div class="container wow fadeIn" data-wow-delay="0.1s">
             <h1 class="display-1 text-secondary text-center mb-0">{{ page_title }}</h1>
@@ -60,8 +56,10 @@
     <!-- Main Content -->
     <main>
         {% block content %}{% endblock %}
-        {% include "partials/insta.html" %}
     </main>
+    <!-- Instagram Section Start -->
+    {% include "partials/insta.html" %}
+    <!-- Instagram Section End -->
 
     <!-- Footer -->
     {% include "partials/footer.html" %}

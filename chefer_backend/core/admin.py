@@ -15,4 +15,12 @@ class FeatureAdmin(admin.ModelAdmin):
     list_display = ('title', 'discount_title', 'discount')
     list_filter = ('discount_title',)
     search_fields = ('title', 'description')
+    
+
+@admin.register(InstagramImage)
+class InstagramImageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'image', 'link', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('id',)
+    ordering = ('-created_at',)
   

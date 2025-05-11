@@ -98,3 +98,13 @@ class TeamMember(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class InstagramImage(models.Model):
+    image = models.ImageField(upload_to='instagram/') 
+    created_at = models.DateTimeField(auto_now_add=True) 
+    link = models.URLField(blank=True, null=True)
+    
+
+    def __str__(self):
+        return f"Instagram Image {self.id}"
