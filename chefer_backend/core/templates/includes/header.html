@@ -40,10 +40,10 @@
                           <div class="nav-item dropdown">
                               <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
                               <div class="dropdown-menu rounded-0 m-0">
-                                  <a href="feature.html" class="dropdown-item">Features</a>
-                                  <a href="blog.html" class="dropdown-item">Blog Post</a>
-                                  <a href="testimonial.html" class="dropdown-item">Testimonial</a>
-                                  <a href="404.html" class="dropdown-item">404 Error</a>
+                                  <a href="{% url 'feature' %}" class="dropdown-item">Features</a>
+                                  <a href="{% url 'blog' %}" class="dropdown-item">Blog Post</a>
+                                  <a href="{% url 'testimonials' %}" class="dropdown-item">Testimonial</a>
+                                  <a href="{% url 'error_404' %}" class="dropdown-item">404 Error</a>
                               </div>
                           </div>
                           <a href="contact.html" class="nav-item nav-link">Contact</a>

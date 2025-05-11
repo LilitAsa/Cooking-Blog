@@ -17,8 +17,8 @@ class Feature(models.Model):
     description = models.TextField()
     image = models.ImageField(upload_to='features/')
     link = models.URLField(blank=True, null=True)  
-    discount_title = models.CharField(max_length=200, blank=True, null=True)  # Заголовок скидки
-    discount = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)  # Размер скидки в процентах
+    discount_title = models.CharField(max_length=200, blank=True, null=True)  
+    discount = models.IntegerField(blank=True, null=True) 
 
 
     def __str__(self):
@@ -50,6 +50,7 @@ class BlogPost(models.Model):
     content = models.TextField()
     image = models.ImageField(upload_to='blog/')
     created_at = models.DateTimeField(auto_now_add=True)
+    author = models.CharField(max_length=100, default='Admin')
 
     def __str__(self):
         return self.title
@@ -105,6 +106,5 @@ class InstagramImage(models.Model):
     created_at = models.DateTimeField(auto_now_add=True) 
     link = models.URLField(blank=True, null=True)
     
-
     def __str__(self):
         return f"Instagram Image {self.id}"

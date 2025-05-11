@@ -6,9 +6,14 @@ urlpatterns = [
     path('', index, name='index'),
     path('about/', about, name='about'),
     path('blog/', blog, name='blog'),
+    path('blog/<int:pk>/', blog_detail, name='blog_detail'),
     path('contact/', contact, name='contact'),
     path('menu/', menu, name='menu'),
     path('team/', team, name='team'),
     path('testimonials/', testimonials, name='testimonials'),
+    path('feature/', feature, name='feature'),
     path('feature/<int:pk>/', feature_detail, name='feature_detail'),
+    path('404/', error_404, name='error_404'),
 ]
+
+handler404 = error_404

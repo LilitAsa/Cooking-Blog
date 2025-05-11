@@ -6,10 +6,11 @@
 
 <head>
     <meta charset="utf-8">
-    <title>{% block title %}Chefer{% endblock %}</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="food blog | HTML CSS JS DJANGO" name="keywords">
     <meta content="food blog | HTML CSS JS DJANGO" name="description">
+    <title>{% block title %}{{page_title}}{% endblock %}</title>
+    {% load static %}
 
     <!-- Favicon -->
     <link href="{% static 'img/favicon.ico' %}" rel="icon">
@@ -42,7 +43,7 @@
     </div>
     <!-- Spinner End -->
 
-    {% include 'partials/header.html' %}
+    {% include 'includes/header.html' %}
 
     {% block hero %}
     <div class="container-fluid p-5 mb-5 bg-dark text-secondary">
@@ -58,11 +59,11 @@
         {% block content %}{% endblock %}
     </main>
     <!-- Instagram Section Start -->
-    {% include "partials/insta.html" %}
+    {% include "includes/insta.html" %}
     <!-- Instagram Section End -->
 
     <!-- Footer -->
-    {% include "partials/footer.html" %}
+    {% include "includes/footer.html" %}
     <!-- Footer End -->
 
     <!-- Back to Top -->

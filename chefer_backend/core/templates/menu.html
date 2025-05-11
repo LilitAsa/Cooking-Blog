@@ -1,44 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{title}}{% endblock %}
-
-
 {% block content %}
-    {% include "partials/feature_part.html" %}
+    {% include "includes/feature_part.html" %}
     <!-- Menu Start -->
-    <div class="container-fluid menu py-5 mt-0 px-0">
-        <div class="mb-5 text-center wow fadeIn" data-wow-delay="0.1s" style="max-width: 700px; margin: auto;">
-            <h5 class="section-title">{{name}}</h5>
-            <h1 class="display-3 mb-0 text-white">{{description}}</h1>
-        </div>
-        <div class="tab-class text-center m-x-auto">
-            <ul class="nav nav-pills d-inline-flex justify-content-center bg-dark text-uppercase rounded-pill mb-5 wow fadeIn" data-wow-delay="0.2s">
-                {% for category in categories %}
-                <li class="nav-item">
-                    <a class="nav-link rounded-pill text-white {% if forloop.first %}active{% endif %}" data-bs-toggle="pill" href="#tab-{{ category.id }}">{{ category.name }}</a>
-                </li>
-                {% endfor %}
-            </ul>
-            <div class="tab-content">
-                {% for category in categories %}
-                <div id="tab-{{ category.id }}" class="tab-pane fade {% if forloop.first %}show p-0 active{% endif %}">
-                    <div class="row g-0">
-                        {% for item in category.menu_items.all %}
-                        <div class="col-lg-3 col-md-4 col-sm-6 wow fadeIn" data-wow-delay="0.{{ forloop.counter }}s">
-                            <div class="position-relative">
-                                <img class="img-fluid" src="{{ item.image.url }}" alt="{{ item.title }} style="max-width: 100%; height: auto;">
-                                <div class="position-absolute bottom-0 end-0 mb-4 me-4 py-1 px-3 bg-dark rounded-pill text-primary">
-                                    {{ item.title }} - ${{ item.price }}
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
+    {% include "includes/menu_part.html" %}
     <!-- Menu End -->
 {% endblock content %}

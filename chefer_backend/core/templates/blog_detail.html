@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+    <!-- Blog Detail Start -->
+    <div class="container-fluid p-5">
+        <div class="row g-5">
+            <div class="col-lg-8">
+                <!-- Blog Detail Start -->
+                <div class="mb-5">
+                    <img class="img-fluid w-100 rounded mb-5" src="{{ post.image.url }}" alt="{{ post.title }}">
+                    <h1 class="mb-4">{{ post.title }}</h1>
+                    <div class="d-flex mb-3">
+                        <small class="me-3"><i class="bi bi-calendar"></i> {{ post.created_at|date:"F d, Y" }}</small>
+                        <small class="me-3"><i class="bi bi-person"></i> {{ post.author }}</small>
+                    </div>
+                    <p>{{ post.content|linebreaks }}</p>
+                </div>
+                <!-- Blog Detail End -->
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Recent Posts Start -->
+                <div class="mb-5">
+                    <h3 class="mb-4">Recent Posts</h3>
+                    {% for recent_post in blog_posts|slice:":3" %}
+                    <div class="d-flex mb-3">
+                        <img class="img-fluid" src="{{ recent_post.image.url }}" style="width: 100px; height: 100px; object-fit: cover;" alt="{{ recent_post.title }}">
+                        <a href="{% url 'blog_detail' recent_post.id %}" class="h5 d-flex align-items-center bg-dark px-3 mb-0">{{ recent_post.title }}</a>
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- Recent Posts End -->
+            </div>
+        </div>
+    </div>
+    <!-- Blog Detail End -->
+{% endblock %} 

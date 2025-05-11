@@ -26,29 +26,14 @@ def get_cached_data(model_class, cache_key, limit=None, **kwargs):
     return data
 
 
-def get_cached_features():
-    return get_cached_data(Feature, 'features')
-
-
-def get_cached_team_members():
-    return get_cached_data(TeamMember, 'team_members')
-
-
-def get_cached_testimonials():
-    return get_cached_data(Testimonial, 'testimonials')
-
-
-def get_cached_blog_posts(limit=None):
-    return get_cached_data(BlogPost, 'blog_posts', limit)
-
-
 def index(request):
-    features = get_cached_features()
-    testimonials = get_cached_testimonials()
-    team_members = get_cached_team_members()
+    features = get_cached_data(Feature, 'features')
+    testimonials = get_cached_data(Testimonial, 'testimonials')
+    team_members = get_cached_data(TeamMember, 'team_members')
     menus = Menu.objects.prefetch_related('dishes').all()
-    blog_posts = get_cached_blog_posts(limit=3)
-    chefs = Chef.objects.all()
+    blog_posts = get_cached_data(BlogPost, 'blog_posts', limit=3)
+    chefs = get_cached_data(Chef, 'chefs')
+    categories = get_cached_data(Category, 'categories')
     
     context = {
         'features': features,
@@ -57,6 +42,7 @@ def index(request):
         'menus': menus,
         'blog_posts': blog_posts,
         'chefs': chefs,
+        'categories': categories,
         'page_title': 'Home',
         'page_subtitle': 'Welcome to Chefer',
     }
@@ -65,7 +51,7 @@ def index(request):
 
 def menu(request):
     categories = get_cached_data(Category, 'categories')
-    features = get_cached_features()
+    features = get_cached_data(Feature, 'features')
     paginator = Paginator(categories, 5) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -82,35 +68,36 @@ def menu(request):
 
 
 def blog(request):
-    blog_posts = get_cached_blog_posts()
-
     context = {
-        'blog_posts': blog_posts,
+        'blog_posts': get_cached_data(BlogPost, 'blog_posts', limit=3),
+        'page_title': 'Blog',
     }
     return render(request, 'blog.html', context)
 
 
 def team(request):
-    team_members = get_cached_team_members()
+    team_members = get_cached_data(TeamMember, 'team_members')
 
     context = {
         'team_members': team_members,
+        'page_title': 'Team',
     }
     return render(request, 'team.html', context)
 
 
 def testimonials(request):
-    testimonials = get_cached_testimonials()
+    testimonials = get_cached_data(Testimonial, 'testimonials')
 
     context = {
         'testimonials': testimonials,
+        'page_title': 'Testimonials',
     }
     return render(request, 'testimonials.html', context)
 
 
 def about(request):
-    chefs = Chef.objects.all()
-    features = get_cached_features()
+    chefs = get_cached_data(Chef, 'chefs')
+    features = get_cached_data(Feature, 'features')
 
     context = {
         'page_title': 'About',
@@ -138,9 +125,33 @@ def contact(request):
     return render(request, 'contact.html', context)
 
 
+def feature(request):
+    features = get_cached_data(Feature, 'features')
+    context = {
+        'features': features,
+        'page_title': 'Features',
+    }
+    return render(request, 'feature.html', context)
+
+
 def feature_detail(request, pk):
     feature = Feature.objects.get(pk=pk)
     context = {
         'feature': feature,
     }
     return render(request, 'feature_detail.html', context)
+
+
+def error_404(request, exception):
+    return render(request, '404.html', {})
+
+
+def blog_detail(request, pk):
+    post = BlogPost.objects.get(pk=pk)
+    blog_posts = get_cached_data(BlogPost, 'blog_posts')
+    context = {
+        'post': post,
+        'blog_posts': blog_posts,
+        'page_title': post.title,
+    }
+    return render(request, 'blog_detail.html', context)
