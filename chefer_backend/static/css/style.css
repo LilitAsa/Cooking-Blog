@@ -214,6 +214,10 @@ h6,
     opacity: 1;
 }
 
+.team-overlay a:hover {
+    color: var(--bs-primary);
+}
+
 .testimonial-carousel .owl-nav {
     margin-top: 30px;
     display: flex;

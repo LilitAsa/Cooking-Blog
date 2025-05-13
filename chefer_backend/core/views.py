@@ -1,6 +1,10 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.core.cache import cache
+from django.core.mail import send_mail
+from django.conf import settings
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from .models import *
   
 
@@ -77,9 +81,11 @@ def blog(request):
 
 def team(request):
     team_members = get_cached_data(TeamMember, 'team_members')
-
+    chefs = get_cached_data(Chef, 'chefs')
+    
     context = {
         'team_members': team_members,
+        'chefs': chefs,
         'page_title': 'Team',
     }
     return render(request, 'team.html', context)
@@ -108,20 +114,112 @@ def about(request):
 
 
 def contact(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        message = request.POST.get('message')
-        
     context = {
         'page_title': 'Contact Us',
         'page_subtitle': 'Get in touch with us',
     }
-    if name and email and message:
-        print(f"Name: {name}, Email: {email}, Message: {message}")
-        context['success_message'] = 'Your message has been sent successfully!'
-    else:
-        context['error_message'] = 'Please fill in all fields.'
+    
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        email = request.POST.get('email', '').strip()
+        subject = request.POST.get('subject', '').strip()
+        message = request.POST.get('message', '').strip()
+        
+        # Validation
+        errors = []
+        
+        if not name:
+            errors.append('Name is required')
+        elif len(name) < 2:
+            errors.append('Name must be at least 2 characters long')
+            
+        if not email:
+            errors.append('Email is required')
+        else:
+            try:
+                validate_email(email)
+            except ValidationError:
+                errors.append('Please enter a valid email address')
+                
+        if not subject:
+            errors.append('Subject is required')
+        elif len(subject) < 5:
+            errors.append('Subject must be at least 5 characters long')
+            
+        if not message:
+            errors.append('Message is required')
+        elif len(message) < 10:
+            errors.append('Message must be at least 10 characters long')
+        
+        if not errors:
+            try:
+                # Save to database
+                contact_message = ContactMessage.objects.create(
+                    name=name,
+                    email=email,
+                    subject=subject,
+                    message=message
+                )
+                
+                # Send email notification
+                email_subject = f'New Contact Message: {subject}'
+                email_message = f'''
+                New message from website contact form:
+                
+                Name: {name}
+                Email: {email}
+                Subject: {subject}
+                
+                Message:
+                {message}
+                '''
+                
+                # Send email to admin
+                send_mail(
+                    email_subject,
+                    email_message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [settings.ADMIN_EMAIL],
+                    fail_silently=False,
+                )
+                
+                # Send confirmation email to user
+                user_email_subject = 'Thank you for contacting us'
+                user_email_message = f'''
+                Dear {name},
+                
+                Thank you for contacting us. We have received your message and will get back to you soon.
+                
+                Your message:
+                {message}
+                
+                Best regards,
+                Chefer Team
+                '''
+                
+                send_mail(
+                    user_email_subject,
+                    user_email_message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    fail_silently=False,
+                )
+                
+                context['success_message'] = 'Your message has been sent successfully!'
+            except Exception as e:
+                context['error_message'] = 'Sorry, there was an error sending your message. Please try again later.'
+                print(f"Error processing message: {e}")
+        else:
+            context['error_message'] = 'Please correct the following errors:'
+            context['form_errors'] = errors
+            # Preserve form data
+            context['form_data'] = {
+                'name': name,
+                'email': email,
+                'subject': subject,
+                'message': message
+            }
+            
     return render(request, 'contact.html', context)
 
 
