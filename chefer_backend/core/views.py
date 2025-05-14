@@ -5,8 +5,59 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from typing import Dict, List, Optional, Any
 from .models import *
-  
+import logging
+
+# Настройка логгера
+logger = logging.getLogger(__name__)
+
+# Константы для валидации
+MIN_NAME_LENGTH = 2
+MIN_SUBJECT_LENGTH = 5
+MIN_MESSAGE_LENGTH = 10
+
+# Константы для сообщений
+ERROR_MESSAGES = {
+    'name_required': 'Name is required',
+    'name_too_short': f'Name must be at least {MIN_NAME_LENGTH} characters long',
+    'email_required': 'Email is required',
+    'email_invalid': 'Please enter a valid email address',
+    'subject_required': 'Subject is required',
+    'subject_too_short': f'Subject must be at least {MIN_SUBJECT_LENGTH} characters long',
+    'message_required': 'Message is required',
+    'message_too_short': f'Message must be at least {MIN_MESSAGE_LENGTH} characters long',
+    'save_error': 'Sorry, there was an error processing your message. Please try again later.',
+    'email_error': 'Message saved but there was an error sending emails.',
+    'success': 'Your message has been sent successfully!',
+}
+
+# Константы для email
+EMAIL_TEMPLATES = {
+    'admin_subject': 'New Contact Message: {subject}',
+    'admin_message': '''
+    New message from website contact form:
+    
+    Name: {name}
+    Email: {email}
+    Subject: {subject}
+    
+    Message:
+    {message}
+    ''',
+    'user_subject': 'Thank you for contacting us',
+    'user_message': '''
+    Dear {name},
+    
+    Thank you for contacting us. We have received your message and will get back to you soon.
+    
+    Your message:
+    {message}
+    
+    Best regards,
+    Chefer Team
+    ''',
+}
 
 def get_cached_data(model_class, cache_key, limit=None, **kwargs):
     """
@@ -113,112 +164,193 @@ def about(request):
     return render(request, 'about.html', context)
 
 
-def contact(request):
-    context = {
+def validate_contact_form_data(name: str, email: str, subject: str, message: str) -> List[str]:
+    """
+    Валидация данных формы контактов
+    
+    Args:
+        name: Имя отправителя
+        email: Email отправителя
+        subject: Тема сообщения
+        message: Текст сообщения
+        
+    Returns:
+        List[str]: Список ошибок валидации
+    """
+    errors = []
+    
+    if not name:
+        errors.append(ERROR_MESSAGES['name_required'])
+    elif len(name) < MIN_NAME_LENGTH:
+        errors.append(ERROR_MESSAGES['name_too_short'])
+        
+    if not email:
+        errors.append(ERROR_MESSAGES['email_required'])
+    else:
+        try:
+            validate_email(email)
+        except ValidationError:
+            errors.append(ERROR_MESSAGES['email_invalid'])
+            
+    if not subject:
+        errors.append(ERROR_MESSAGES['subject_required'])
+    elif len(subject) < MIN_SUBJECT_LENGTH:
+        errors.append(ERROR_MESSAGES['subject_too_short'])
+        
+    if not message:
+        errors.append(ERROR_MESSAGES['message_required'])
+    elif len(message) < MIN_MESSAGE_LENGTH:
+        errors.append(ERROR_MESSAGES['message_too_short'])
+        
+    return errors
+
+
+def send_contact_emails(name: str, email: str, subject: str, message: str) -> bool:
+    """
+    Отправка email-уведомлений
+    
+    Args:
+        name: Имя отправителя
+        email: Email отправителя
+        subject: Тема сообщения
+        message: Текст сообщения
+        
+    Returns:
+        bool: True если письма отправлены успешно, False в случае ошибки
+    """
+    from_email = settings.DEFAULT_FROM_EMAIL or 'noreply@example.com'
+    admin_email = settings.ADMIN_EMAIL or 'admin@example.com'
+    
+    try:
+        # Подготовка данных для писем
+        admin_subject = EMAIL_TEMPLATES['admin_subject'].format(subject=subject)
+        admin_message = EMAIL_TEMPLATES['admin_message'].format(
+            name=name,
+            email=email,
+            subject=subject,
+            message=message
+        )
+        
+        user_subject = EMAIL_TEMPLATES['user_subject']
+        user_message = EMAIL_TEMPLATES['user_message'].format(
+            name=name,
+            message=message
+        )
+        
+        # Отправка письма администратору
+        try:
+            logger.info(f"Attempting to send admin notification to {admin_email}")
+            send_mail(
+                admin_subject,
+                admin_message,
+                from_email,
+                [admin_email],
+                fail_silently=False,  # Изменено на False для получения ошибок
+            )
+            logger.info(f"Admin notification sent successfully to {admin_email}")
+        except Exception as e:
+            logger.error(f"Failed to send admin notification: {str(e)}", exc_info=True)
+            logger.error(f"Email settings: host={settings.EMAIL_HOST}, port={settings.EMAIL_PORT}, "
+                        f"use_tls={settings.EMAIL_USE_TLS}, from_email={from_email}")
+            return False
+        
+        # Отправка подтверждения пользователю
+        try:
+            logger.info(f"Attempting to send user confirmation to {email}")
+            send_mail(
+                user_subject,
+                user_message,
+                from_email,
+                [email],
+                fail_silently=False,  # Изменено на False для получения ошибок
+            )
+            logger.info(f"User confirmation sent successfully to {email}")
+        except Exception as e:
+            logger.error(f"Failed to send user confirmation: {str(e)}", exc_info=True)
+            logger.error(f"Email settings: host={settings.EMAIL_HOST}, port={settings.EMAIL_PORT}, "
+                        f"use_tls={settings.EMAIL_USE_TLS}, from_email={from_email}")
+            return False
+        
+        return True
+    except Exception as e:
+        logger.error(f"Unexpected error in send_contact_emails: {str(e)}", exc_info=True)
+        logger.error(f"Email settings: host={settings.EMAIL_HOST}, port={settings.EMAIL_PORT}, "
+                    f"use_tls={settings.EMAIL_USE_TLS}, from_email={from_email}")
+        return False
+
+
+def contact(request) -> Any:
+    """
+    Представление для страницы контактов
+    
+    Args:
+        request: HTTP запрос
+        
+    Returns:
+        HttpResponse: Ответ с отрендеренным шаблоном
+    """
+    context: Dict[str, Any] = {
         'page_title': 'Contact Us',
         'page_subtitle': 'Get in touch with us',
     }
     
     if request.method == 'POST':
-        name = request.POST.get('name', '').strip()
-        email = request.POST.get('email', '').strip()
-        subject = request.POST.get('subject', '').strip()
-        message = request.POST.get('message', '').strip()
+        logger.info("Received POST request to contact form")
         
-        # Validation
-        errors = []
-        
-        if not name:
-            errors.append('Name is required')
-        elif len(name) < 2:
-            errors.append('Name must be at least 2 characters long')
-            
-        if not email:
-            errors.append('Email is required')
-        else:
-            try:
-                validate_email(email)
-            except ValidationError:
-                errors.append('Please enter a valid email address')
-                
-        if not subject:
-            errors.append('Subject is required')
-        elif len(subject) < 5:
-            errors.append('Subject must be at least 5 characters long')
-            
-        if not message:
-            errors.append('Message is required')
-        elif len(message) < 10:
-            errors.append('Message must be at least 10 characters long')
-        
-        if not errors:
-            try:
-                # Save to database
-                contact_message = ContactMessage.objects.create(
-                    name=name,
-                    email=email,
-                    subject=subject,
-                    message=message
-                )
-                
-                # Send email notification
-                email_subject = f'New Contact Message: {subject}'
-                email_message = f'''
-                New message from website contact form:
-                
-                Name: {name}
-                Email: {email}
-                Subject: {subject}
-                
-                Message:
-                {message}
-                '''
-                
-                # Send email to admin
-                send_mail(
-                    email_subject,
-                    email_message,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [settings.ADMIN_EMAIL],
-                    fail_silently=False,
-                )
-                
-                # Send confirmation email to user
-                user_email_subject = 'Thank you for contacting us'
-                user_email_message = f'''
-                Dear {name},
-                
-                Thank you for contacting us. We have received your message and will get back to you soon.
-                
-                Your message:
-                {message}
-                
-                Best regards,
-                Chefer Team
-                '''
-                
-                send_mail(
-                    user_email_subject,
-                    user_email_message,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [email],
-                    fail_silently=False,
-                )
-                
-                context['success_message'] = 'Your message has been sent successfully!'
-            except Exception as e:
-                context['error_message'] = 'Sorry, there was an error sending your message. Please try again later.'
-                print(f"Error processing message: {e}")
-        else:
-            context['error_message'] = 'Please correct the following errors:'
-            context['form_errors'] = errors
-            # Preserve form data
-            context['form_data'] = {
-                'name': name,
-                'email': email,
-                'subject': subject,
-                'message': message
+        try:
+            # Получение и очистка данных формы
+            form_data = {
+                'name': request.POST.get('name', '').strip(),
+                'email': request.POST.get('email', '').strip(),
+                'subject': request.POST.get('subject', '').strip(),
+                'message': request.POST.get('message', '').strip(),
             }
+            logger.info(f"Form data received: {form_data}")
+            
+            # Валидация данных
+            errors = validate_contact_form_data(**form_data)
+            
+            if errors:
+                logger.warning(f"Validation errors: {errors}")
+                context['error_message'] = 'Please correct the following errors:'
+                context['form_errors'] = errors
+                context['form_data'] = form_data
+                return render(request, 'contact.html', context)
+            
+            # Сохранение сообщения в базу данных
+            try:
+                contact_message = ContactMessage.objects.create(**form_data)
+                logger.info(f"Message saved to database with ID: {contact_message.id}")
+            except Exception as e:
+                logger.error(f"Database error: {str(e)}", exc_info=True)
+                context['error_message'] = ERROR_MESSAGES['save_error']
+                context['form_data'] = form_data
+                return render(request, 'contact.html', context)
+            
+            # Отправка email-уведомлений
+            try:
+                if send_contact_emails(**form_data):
+                    logger.info(f"Emails sent successfully for message ID: {contact_message.id}")
+                    context['success_message'] = ERROR_MESSAGES['success']
+                else:
+                    logger.warning(f"Email sending failed for message ID: {contact_message.id}")
+                    context['error_message'] = ERROR_MESSAGES['email_error']
+                    # Сохраняем информацию об ошибке в базе данных
+                    contact_message.is_read = False
+                    contact_message.save()
+            except Exception as e:
+                logger.error(f"Email sending error: {str(e)}", exc_info=True)
+                context['error_message'] = ERROR_MESSAGES['email_error']
+                # Сохраняем информацию об ошибке в базе данных
+                contact_message.is_read = False
+                contact_message.save()
+                
+        except Exception as e:
+            logger.error(f"Unexpected error in contact view: {str(e)}", exc_info=True)
+            context['error_message'] = ERROR_MESSAGES['save_error']
+            # Сохраняем данные формы для повторной отправки
+            if 'form_data' in locals():
+                context['form_data'] = form_data
             
     return render(request, 'contact.html', context)
 
@@ -241,7 +373,13 @@ def feature_detail(request, pk):
 
 
 def error_404(request, exception):
-    return render(request, '404.html', {})
+    context = {
+        'page_title': '404',
+        'page_subtitle': 'Page not found',
+        'error_message': 'The page you are looking for does not exist.',
+    }   
+    
+    return render(request, '404.html', context)
 
 
 def blog_detail(request, pk):
@@ -253,3 +391,4 @@ def blog_detail(request, pk):
         'page_title': post.title,
     }
     return render(request, 'blog_detail.html', context)
+

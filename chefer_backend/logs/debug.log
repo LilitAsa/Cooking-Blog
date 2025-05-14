@@ -1,0 +1,28 @@
+INFO 2025-05-14 15:19:09,337 views 8896 8160 Received POST request to contact form
+INFO 2025-05-14 15:19:09,340 views 8896 8160 Form data received: {'name': 'Test User3', 'email': 'test3@example.com', 'subject': 'subject', 'message': '444444444444444'}
+INFO 2025-05-14 15:19:09,547 views 8896 8160 Message saved to database with ID: 6
+ERROR 2025-05-14 15:19:09,547 views 8896 8160 Email sending error: 'Settings' object has no attribute 'ADMIN_EMAIL'
+Traceback (most recent call last):
+  File "C:\Users\HOME\Desktop\practica projects\Chefer-1.0.0\chefer_backend\core\views.py", line 332, in contact
+    if send_contact_emails(**form_data):
+       ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HOME\Desktop\practica projects\Chefer-1.0.0\chefer_backend\core\views.py", line 222, in send_contact_emails
+    admin_email = settings.ADMIN_EMAIL or 'admin@example.com'
+                  ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HOME\Desktop\practica projects\Chefer-1.0.0\env\Lib\site-packages\django\conf\__init__.py", line 83, in __getattr__
+    val = getattr(_wrapped, name)
+AttributeError: 'Settings' object has no attribute 'ADMIN_EMAIL'
+INFO 2025-05-14 15:23:06,736 views 9360 6748 Received POST request to contact form
+INFO 2025-05-14 15:23:06,751 views 9360 6748 Form data received: {'name': 'Test User3', 'email': 'test3@example.com', 'subject': 'Test Message', 'message': 'Test Message content'}
+INFO 2025-05-14 15:23:07,038 views 9360 6748 Message saved to database with ID: 7
+ERROR 2025-05-14 15:23:07,039 views 9360 6748 Email sending error: 'Settings' object has no attribute 'ADMIN_EMAIL'
+Traceback (most recent call last):
+  File "C:\Users\HOME\Desktop\practica projects\Chefer-1.0.0\chefer_backend\core\views.py", line 332, in contact
+    if send_contact_emails(**form_data):
+       ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HOME\Desktop\practica projects\Chefer-1.0.0\chefer_backend\core\views.py", line 222, in send_contact_emails
+    admin_email = settings.ADMIN_EMAIL or 'admin@example.com'
+                  ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HOME\Desktop\practica projects\Chefer-1.0.0\env\Lib\site-packages\django\conf\__init__.py", line 83, in __getattr__
+    val = getattr(_wrapped, name)
+AttributeError: 'Settings' object has no attribute 'ADMIN_EMAIL'

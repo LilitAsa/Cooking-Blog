@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -128,11 +129,56 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email settings
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.mail.yahoo.com'  # Yahoo SMTP сервер
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'lilitasa24@yahoo.com'
-EMAIL_HOST_PASSWORD = ''  # Здесь нужно вставить пароль приложения после его создания
-DEFAULT_FROM_EMAIL = 'lilitasa24@yahoo.com'
-ADMIN_EMAIL = 'lilitasa24@yahoo.com'
+if DEBUG:
+    # Для разработки используем консольный бэкенд
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    # Для продакшена настраиваем реальный SMTP
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'  # или другой SMTP сервер
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = ''  # будет настроено позже
+    EMAIL_HOST_PASSWORD = ''  # будет настроено позже
+
+# Общие настройки email (работают в обоих режимах)
+DEFAULT_FROM_EMAIL = 'noreply@chefer.com'  # Email отправителя по умолчанию
+ADMIN_EMAIL = 'admin@chefer.com'  # Email администратора
+SERVER_EMAIL = 'server@chefer.com'  # Email для системных уведомлений
+
+# Logging settings
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'debug.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'core': {  # Это имя нашего приложения
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
+# Создаем директорию для логов, если она не существует
+os.makedirs(BASE_DIR / 'logs', exist_ok=True)
