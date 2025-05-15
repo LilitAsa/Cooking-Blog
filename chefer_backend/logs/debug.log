@@ -74,3 +74,19 @@ INFO 2025-05-15 17:28:11,234 views 3652 7436 Admin notification sent successfull
 INFO 2025-05-15 17:28:11,237 views 3652 7436 Attempting to send user confirmation to js.now@gmail.com
 INFO 2025-05-15 17:28:11,242 views 3652 7436 User confirmation sent successfully to js.now@gmail.com
 INFO 2025-05-15 17:28:11,243 views 3652 7436 Emails sent successfully for message ID: 9
+INFO 2025-05-15 17:52:11,312 views 11648 5680 Received POST request to contact form
+WARNING 2025-05-15 17:52:11,435 views 11648 5680 Form validation errors: <ul class="errorlist"><li>captcha<ul class="errorlist" id="id_captcha_error"><li>Invalid security check code</li></ul></li></ul>
+INFO 2025-05-15 17:54:36,223 views 11648 6800 Received POST request to contact form
+WARNING 2025-05-15 17:54:36,247 views 11648 6800 Form validation errors: <ul class="errorlist"><li>captcha<ul class="errorlist" id="id_captcha_error"><li>Invalid security check code</li></ul></li></ul>
+INFO 2025-05-15 17:56:07,654 views 11648 6800 Received POST request to contact form
+WARNING 2025-05-15 17:56:07,679 views 11648 6800 Form validation errors: <ul class="errorlist"><li>captcha<ul class="errorlist" id="id_captcha_error"><li>Invalid security check code</li></ul></li></ul>
+INFO 2025-05-15 17:56:21,050 views 11648 5276 Received POST request to contact form
+INFO 2025-05-15 17:56:21,065 views 11648 5276 Form data received: {'name': 'John Smith', 'email': 'js.now@gmail.com', 'subject': 'Test Message', 'message': 'Test Message'}
+INFO 2025-05-15 17:56:21,075 views 11648 5276 Message saved to database with ID: 10
+INFO 2025-05-15 17:56:21,076 views 11648 5276 Attempting to send admin notification to admin@chefer.com
+INFO 2025-05-15 17:56:21,096 views 11648 5276 Admin notification sent successfully to admin@chefer.com
+INFO 2025-05-15 17:56:21,097 views 11648 5276 Attempting to send user confirmation to js.now@gmail.com
+INFO 2025-05-15 17:56:21,112 views 11648 5276 User confirmation sent successfully to js.now@gmail.com
+INFO 2025-05-15 17:56:21,113 views 11648 5276 Emails sent successfully for message ID: 10
+INFO 2025-05-15 17:57:38,214 views 11648 17972 Received POST request to contact form
+WARNING 2025-05-15 17:57:38,234 views 11648 17972 Form validation errors: <ul class="errorlist"><li>captcha<ul class="errorlist" id="id_captcha_error"><li>Invalid security check code</li></ul></li></ul>

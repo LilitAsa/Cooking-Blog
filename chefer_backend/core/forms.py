@@ -1,4 +1,3 @@
-
 from django import forms
 from captcha.fields import CaptchaField
 
@@ -40,4 +39,13 @@ class ContactForm(forms.Form):
             'required': 'Please complete the security check',
             'invalid': 'Invalid security check code'
         }
+    )
+
+class NewsletterForm(forms.Form):
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control border-white p-3',
+            'placeholder': 'Your Email',
+            'required': True
+        })
     )

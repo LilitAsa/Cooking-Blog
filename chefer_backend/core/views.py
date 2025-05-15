@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 from django import forms
 from django.core.paginator import Paginator
 from django.core.cache import cache
@@ -13,7 +13,9 @@ from django.http import HttpResponse
 from django.views.decorators.http import require_http_methods
 from django.utils.translation import gettext_lazy as _
 from captcha.fields import CaptchaField
-from .forms import ContactForm
+from .forms import ContactForm, NewsletterForm
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
 
 # Настройка логгера
 logger = logging.getLogger(__name__)
@@ -369,14 +371,15 @@ def feature(request):
 
 
 def feature_detail(request, pk):
-    feature = Feature.objects.get(pk=pk)
+    feature = get_object_or_404(Feature, pk=pk)
+    
     context = {
         'feature': feature,
     }
     return render(request, 'feature_detail.html', context)
 
 
-def error_404(request, exception):
+def error_404(request):
     context = {
         'page_title': '404',
         'page_subtitle': 'Page not found',
@@ -396,3 +399,50 @@ def blog_detail(request, pk):
     }
     return render(request, 'blog_detail.html', context)
 
+
+def newsletter_subscribe(request):
+    if request.method == 'POST':
+        form = NewsletterForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            NewsletterSubscriber.objects.get_or_create(email=email)
+            return render(request, 'newsletter_success.html', {'email': email})
+    else:
+        form = NewsletterForm()
+    return render(request, 'newsletter_form.html', {'form': form})
+
+
+def send_newsletter(subject, message, from_email=None):
+    subscribers = NewsletterSubscriber.objects.values_list('email', flat=True)
+    if not from_email:
+        from_email = 'noreply@chefer.com'  # или settings.DEFAULT_FROM_EMAIL
+    send_mail(
+        subject,
+        message,
+        from_email,
+        list(subscribers),
+        fail_silently=False,
+    )
+
+class NewsletterSendForm(forms.Form):
+    subject = forms.CharField(max_length=200, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject'}))
+    message = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Message', 'rows': 6}))
+
+@staff_member_required
+def send_newsletter_view(request):
+    if request.method == 'POST':
+        form = NewsletterSendForm(request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            message = form.cleaned_data['message']
+            from_email = settings.DEFAULT_FROM_EMAIL
+            subscribers = NewsletterSubscriber.objects.values_list('email', flat=True)
+            sent_count = 0
+            for email in subscribers:
+                send_mail(subject, message, from_email, [email], fail_silently=False)
+                sent_count += 1
+            messages.success(request, f'Newsletter sent to {sent_count} subscribers!')
+            return redirect('send_newsletter')
+    else:
+        form = NewsletterSendForm()
+    return render(request, 'send_newsletter.html', {'form': form})

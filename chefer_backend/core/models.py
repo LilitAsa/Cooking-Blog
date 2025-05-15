@@ -125,3 +125,13 @@ class ContactMessage(models.Model):
         ordering = ['-created_at']
         verbose_name = 'Contact Message'
         verbose_name_plural = 'Contact Messages'
+        
+
+
+class NewsletterSubscriber(models.Model):
+    email = models.EmailField(unique=True)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email
+    

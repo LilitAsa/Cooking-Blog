@@ -9,7 +9,7 @@
             <div class="feature-item rounded text-center p-5">
                 <img class="img-fluid bg-white rounded-circle" src="{{ feature.image.url }}" style="width: 150px; height: 150px;">
                 <h3 class="my-4">{{ feature.title }}</h3>
-                <p class="text-light">{{ feature.description }}</p>
+                <p class="text-light">{{ feature.description | truncatechars:100 }}</p>
 
                 <a class="font-body" style="letter-spacing: 1px;" href="{% url 'feature_detail' feature.id %}">Read More <i class="bi bi-arrow-right"></i></a>
             </div>

@@ -12,11 +12,11 @@
                     </div>
                     <div class="d-flex mb-2">
                         <i class="bi bi-envelope-open text-primary me-2"></i>
-                        <p class="mb-0">info@example.com</p>
+                        <p class="mb-0"><a href="mailto:info@example.com" class="text-secondary">info@example.com</a></p>
                     </div>
                     <div class="d-flex mb-2">
                         <i class="bi bi-telephone text-primary me-2"></i>
-                        <p class="mb-0">+012 345 67890</p>
+                        <p class="mb-0"><a href="tel:+01234567890" class="text-secondary">+012 345 67890</a></p>
                     </div>
                     <div class="d-flex mt-4">
                         <a class="btn btn-primary btn-square rounded-circle me-2" href="#"><i
@@ -32,35 +32,23 @@
                 <div class="col-lg-4 col-md-12 pt-0 pt-lg-5 mb-5">
                     <h3 class="text-light mb-4">Quick Links</h3>
                     <div class="d-flex flex-column justify-content-start">
-                        <a class="text-secondary mb-2" href="#"><i
-                                class="bi bi-arrow-right text-primary me-2"></i>Home</a>
-                        <a class="text-secondary mb-2" href="#"><i
-                                class="bi bi-arrow-right text-primary me-2"></i>About Us</a>
-                        <a class="text-secondary mb-2" href="#"><i
-                                class="bi bi-arrow-right text-primary me-2"></i>Food Menu</a>
-                        <a class="text-secondary mb-2" href="#"><i
-                                class="bi bi-arrow-right text-primary me-2"></i>Our Chefs</a>
-                        <a class="text-secondary mb-2" href="#"><i
-                                class="bi bi-arrow-right text-primary me-2"></i>Latest Blog</a>
-                        <a class="text-secondary" href="#"><i
-                                class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
+                        <a class="text-secondary mb-2" href="{% url 'index' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Home</a>
+                        <a class="text-secondary mb-2" href="{% url 'about' %}"><i class="bi bi-arrow-right text-primary me-2"></i>About Us</a>
+                        <a class="text-secondary mb-2" href="{% url 'menu' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Food Menu</a>
+                        <a class="text-secondary mb-2" href="{% url 'team' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Our Chefs</a>
+                        <a class="text-secondary mb-2" href="{% url 'blog' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Latest Blog</a>
+                        <a class="text-secondary" href="{% url 'contact' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-12 pt-0 pt-lg-5 mb-5">
                     <h3 class="text-light mb-4">More Links</h3>
                     <div class="d-flex flex-column justify-content-start">
-                        <a class="text-secondary mb-2" href="#"><i
-                                class="bi bi-arrow-right text-primary me-2"></i>Home</a>
-                        <a class="text-secondary mb-2" href="#"><i
-                                class="bi bi-arrow-right text-primary me-2"></i>About Us</a>
-                        <a class="text-secondary mb-2" href="#"><i
-                                class="bi bi-arrow-right text-primary me-2"></i>Food Menu</a>
-                        <a class="text-secondary mb-2" href="#"><i
-                                class="bi bi-arrow-right text-primary me-2"></i>Our Chefs</a>
-                        <a class="text-secondary mb-2" href="#"><i
-                                class="bi bi-arrow-right text-primary me-2"></i>Latest Blog</a>
-                        <a class="text-secondary" href="#"><i
-                                class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
+                        <a class="text-secondary mb-2" href="{% url 'index' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Home</a>
+                        <a class="text-secondary mb-2" href="{% url 'about' %}"><i class="bi bi-arrow-right text-primary me-2"></i>About Us</a>
+                        <a class="text-secondary mb-2" href="{% url 'menu' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Food Menu</a>
+                        <a class="text-secondary mb-2" href="{% url 'team' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Our Chefs</a>
+                        <a class="text-secondary mb-2" href="{% url 'blog' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Latest Blog</a>
+                        <a class="text-secondary" href="{% url 'contact' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
                     </div>
                 </div>
             </div>
@@ -71,10 +59,11 @@
                 <h3 class="text-white mb-4">Newsletter</h3>
                 <h6 class="text-uppercase text-light mb-2">Subscribe Our Newsletter</h6>
                 <p class="small text-secondary">Amet justo diam dolor rebum lorem sit stet sea justo kasd</p>
-                <form action="">
+                <form action="{% url 'newsletter_subscribe' %}" method="post">
+                    {% csrf_token %}
                     <div class="input-group">
-                        <input type="text" class="form-control border-white p-3" placeholder="Your Email">
-                        <button class="btn btn-primary">Sign Up</button>
+                        <input type="email" name="email" class="form-control border-white p-3" placeholder="Your Email" required>
+                        <button class="btn btn-primary" type="submit">Sign Up</button>
                     </div>
                 </form>
             </div>
