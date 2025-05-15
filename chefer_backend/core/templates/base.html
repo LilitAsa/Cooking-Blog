@@ -5,12 +5,11 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="food blog | HTML CSS JS DJANGO" name="keywords">
     <meta content="food blog | HTML CSS JS DJANGO" name="description">
     <title>{% block title %}{{page_title}}{% endblock %}</title>
-    {% load static %}
 
     <!-- Favicon -->
     <link href="{% static 'img/favicon.ico' %}" rel="icon">
@@ -33,7 +32,93 @@
 
     <!-- Template Stylesheet -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'css/captcha.css' %}" rel="stylesheet">
 
+    <style>
+        /* Стили для CAPTCHA */
+        .captcha {
+            margin-bottom: 1rem;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .captcha-image {
+            margin-bottom: 10px;
+        }
+        .captcha img {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            margin-bottom: 10px;
+            background: white;
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        .captcha input {
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            margin-top: 10px;
+        }
+        .captcha a {
+            display: inline-block;
+            margin-top: 10px;
+            color: #0d6efd;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .captcha a:hover {
+            color: #0a58ca;
+            text-decoration: underline;
+        }
+        .captcha .form-text {
+            color: #6c757d;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        .captcha-field {
+            margin-bottom: 1rem;
+        }
+        .captcha-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        /* Стили для полей формы */
+        .form-control {
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+        }
+        .form-control:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        textarea.form-control {
+            min-height: 120px;
+        }
+        .invalid-feedback {
+            display: block;
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        /* Стили для сообщений об ошибках */
+        .errorlist {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            color: #dc3545;
+            font-size: 0.875rem;
+        }
+        .errorlist li {
+            margin-top: 0.25rem;
+        }
+    </style>
 </head>
 
 <body>

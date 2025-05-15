@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'captcha',
 ]
 
 MIDDLEWARE = [
@@ -52,15 +53,22 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'chefer_backend.urls'
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'core' / 'templates'],
+        'DIRS': [
+            BASE_DIR / 'templates',
+            BASE_DIR / 'core' / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -182,3 +190,19 @@ LOGGING = {
 
 # Создаем директорию для логов, если она не существует
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)
+
+# Captcha settings
+CAPTCHA_LENGTH = 6
+CAPTCHA_FONT_SIZE = 30
+CAPTCHA_BACKGROUND_COLOR = '#ffffff'
+CAPTCHA_FOREGROUND_COLOR = '#001a33'
+CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
+CAPTCHA_IMAGE_SIZE = (160, 50)
+CAPTCHA_FONT_PATH = os.path.join(BASE_DIR, 'static/fonts/Vera.ttf')
+CAPTCHA_TIMEOUT = 1
+CAPTCHA_DICTIONARY_MIN_LENGTH = 2
+CAPTCHA_DICTIONARY_MAX_LENGTH = 4
+CAPTCHA_OUTPUT_FORMAT = '%(image)s %(hidden_field)s %(text_field)s'
+CAPTCHA_FILTER_FUNCTIONS = ('captcha.helpers.post_smooth',)
+CAPTCHA_IMAGE_TEMPLATE = 'captcha/image.html'

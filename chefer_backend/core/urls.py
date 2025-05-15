@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .views import *
+from django.conf.urls import include
 
 urlpatterns = [
     path('', index, name='index'),
@@ -14,6 +15,7 @@ urlpatterns = [
     path('feature/', feature, name='feature'),
     path('feature/<int:pk>/', feature_detail, name='feature_detail'),
     path('404/', error_404, name='error_404'),
+    path('captcha/', include('captcha.urls')),
 ]
 
 handler404 = error_404

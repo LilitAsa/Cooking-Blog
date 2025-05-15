@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django import forms
 from django.core.paginator import Paginator
 from django.core.cache import cache
 from django.core.mail import send_mail
@@ -8,6 +9,11 @@ from django.core.exceptions import ValidationError
 from typing import Dict, List, Optional, Any
 from .models import *
 import logging
+from django.http import HttpResponse
+from django.views.decorators.http import require_http_methods
+from django.utils.translation import gettext_lazy as _
+from captcha.fields import CaptchaField
+from .forms import ContactForm
 
 # Настройка логгера
 logger = logging.getLogger(__name__)
@@ -79,7 +85,7 @@ def get_cached_data(model_class, cache_key, limit=None, **kwargs):
         cache.set(full_cache_key, data, 60 * 15)  # Кэш на 15 минут
     
     return data
-
+  
 
 def index(request):
     features = get_cached_data(Feature, 'features')
@@ -89,7 +95,7 @@ def index(request):
     blog_posts = get_cached_data(BlogPost, 'blog_posts', limit=3)
     chefs = get_cached_data(Chef, 'chefs')
     categories = get_cached_data(Category, 'categories')
-    
+
     context = {
         'features': features,
         'testimonials': testimonials,
@@ -133,7 +139,7 @@ def blog(request):
 def team(request):
     team_members = get_cached_data(TeamMember, 'team_members')
     chefs = get_cached_data(Chef, 'chefs')
-    
+
     context = {
         'team_members': team_members,
         'chefs': chefs,
@@ -164,7 +170,7 @@ def about(request):
     return render(request, 'about.html', context)
 
 
-def validate_contact_form_data(name: str, email: str, subject: str, message: str) -> List[str]:
+def validate_contact_form_data(name: str, email: str, subject: str, message: str, captcha: str) -> List[str]:
     """
     Валидация данных формы контактов
     
@@ -173,6 +179,7 @@ def validate_contact_form_data(name: str, email: str, subject: str, message: str
         email: Email отправителя
         subject: Тема сообщения
         message: Текст сообщения
+        captcha: Значение CAPTCHA
         
     Returns:
         List[str]: Список ошибок валидации
@@ -180,27 +187,27 @@ def validate_contact_form_data(name: str, email: str, subject: str, message: str
     errors = []
     
     if not name:
-        errors.append(ERROR_MESSAGES['name_required'])
-    elif len(name) < MIN_NAME_LENGTH:
-        errors.append(ERROR_MESSAGES['name_too_short'])
+        errors.append('Name is required')
+    elif len(name) < 2:
+        errors.append('Name must be at least 2 characters long')
         
     if not email:
-        errors.append(ERROR_MESSAGES['email_required'])
-    else:
-        try:
-            validate_email(email)
-        except ValidationError:
-            errors.append(ERROR_MESSAGES['email_invalid'])
-            
+        errors.append('Email is required')
+    elif '@' not in email or '.' not in email:
+        errors.append('Please enter a valid email address')
+        
     if not subject:
-        errors.append(ERROR_MESSAGES['subject_required'])
-    elif len(subject) < MIN_SUBJECT_LENGTH:
-        errors.append(ERROR_MESSAGES['subject_too_short'])
+        errors.append('Subject is required')
+    elif len(subject) < 5:
+        errors.append('Subject must be at least 5 characters long')
         
     if not message:
-        errors.append(ERROR_MESSAGES['message_required'])
-    elif len(message) < MIN_MESSAGE_LENGTH:
-        errors.append(ERROR_MESSAGES['message_too_short'])
+        errors.append('Message is required')
+    elif len(message) < 10:
+        errors.append('Message must be at least 10 characters long')
+        
+    if not captcha:
+        errors.append('Please complete the CAPTCHA')
         
     return errors
 
@@ -292,30 +299,29 @@ def contact(request) -> Any:
     context: Dict[str, Any] = {
         'page_title': 'Contact Us',
         'page_subtitle': 'Get in touch with us',
+        'form': ContactForm(),  # Добавляем форму в контекст
     }
     
     if request.method == 'POST':
         logger.info("Received POST request to contact form")
         
         try:
+            form = ContactForm(request.POST)
+            if not form.is_valid():
+                logger.warning(f"Form validation errors: {form.errors}")
+                context['error_message'] = 'Please correct the following errors:'
+                context['form_errors'] = form.errors
+                context['form'] = form
+                return render(request, 'contact.html', context)
+            
             # Получение и очистка данных формы
             form_data = {
-                'name': request.POST.get('name', '').strip(),
-                'email': request.POST.get('email', '').strip(),
-                'subject': request.POST.get('subject', '').strip(),
-                'message': request.POST.get('message', '').strip(),
+                'name': form.cleaned_data['name'].strip(),
+                'email': form.cleaned_data['email'].strip(),
+                'subject': form.cleaned_data['subject'].strip(),
+                'message': form.cleaned_data['message'].strip(),
             }
             logger.info(f"Form data received: {form_data}")
-            
-            # Валидация данных
-            errors = validate_contact_form_data(**form_data)
-            
-            if errors:
-                logger.warning(f"Validation errors: {errors}")
-                context['error_message'] = 'Please correct the following errors:'
-                context['form_errors'] = errors
-                context['form_data'] = form_data
-                return render(request, 'contact.html', context)
             
             # Сохранение сообщения в базу данных
             try:
@@ -324,7 +330,7 @@ def contact(request) -> Any:
             except Exception as e:
                 logger.error(f"Database error: {str(e)}", exc_info=True)
                 context['error_message'] = ERROR_MESSAGES['save_error']
-                context['form_data'] = form_data
+                context['form'] = form
                 return render(request, 'contact.html', context)
             
             # Отправка email-уведомлений
@@ -348,9 +354,7 @@ def contact(request) -> Any:
         except Exception as e:
             logger.error(f"Unexpected error in contact view: {str(e)}", exc_info=True)
             context['error_message'] = ERROR_MESSAGES['save_error']
-            # Сохраняем данные формы для повторной отправки
-            if 'form_data' in locals():
-                context['form_data'] = form_data
+            context['form'] = form
             
     return render(request, 'contact.html', context)
 

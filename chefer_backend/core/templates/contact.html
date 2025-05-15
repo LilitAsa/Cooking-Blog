@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block title %}{{ page_title }}{% endblock %}
+
 {% block content %}
     <!-- Contact Start -->
     <div class="container-fluid p-5">
@@ -41,53 +43,90 @@
             </div>
             <div class="col-lg-6 wow fadeIn" data-wow-delay="0.3s">
                 <div class="bg-light rounded p-5">
-                    {% if success_message %}
-                    <div class="alert alert-success" role="alert">
-                        {{ success_message }}
-                    </div>
-                    {% endif %}
+                    <h2 class="card-title text-center mb-4">{{ page_title }}</h2>
+                    <p class="text-center text-muted mb-4">{{ page_subtitle }}</p>
+
                     {% if error_message %}
                     <div class="alert alert-danger" role="alert">
                         {{ error_message }}
                         {% if form_errors %}
                         <ul class="mb-0 mt-2">
-                            {% for error in form_errors %}
-                            <li>{{ error }}</li>
+                            {% for field, errors in form_errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
                             {% endfor %}
                         </ul>
                         {% endif %}
                     </div>
                     {% endif %}
-                    <form method="POST">
+
+                    {% if success_message %}
+                    <div class="alert alert-success" role="alert">
+                        {{ success_message }}
+                    </div>
+                    {% endif %}
+
+                    <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="name" name="name" placeholder="Your Name" value="{{ form_data.name|default:'' }}">
-                                    <label for="name">Your Name</label>
+                        
+                        <div class="mb-3">
+                            <label for="id_name" class="form-label">Name</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.name.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_email" class="form-label">Email</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.email.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_subject" class="form-label">Subject</label>
+                            {{ form.subject }}
+                            {% if form.subject.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.subject.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_message" class="form-label">Message</label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.message.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="captcha">
+                                <label for="id_captcha" class="form-label">Security Check</label>
+                                {{ form.captcha }}
+                                <small class="form-text text-muted mt-2 text-italic">
+                                    Please enter the code shown in the image above to verify you are not a robot.
+                                </small>
+                                {% if form.captcha.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.captcha.errors }}
                                 </div>
+                                {% endif %}
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="email" class="form-control" id="email" name="email" placeholder="Your Email" value="{{ form_data.email|default:'' }}">
-                                    <label for="email">Your Email</label>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="subject" name="subject" placeholder="Subject" value="{{ form_data.subject|default:'' }}">
-                                    <label for="subject">Subject</label>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-floating">
-                                    <textarea class="form-control" placeholder="Leave a message here" id="message" name="message" style="height: 100px">{{ form_data.message|default:'' }}</textarea>
-                                    <label for="message">Message</label>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <button class="btn btn-primary w-100 py-3" type="submit">Send Message</button>
-                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Send Message</button>
                         </div>
                     </form>
                 </div>
