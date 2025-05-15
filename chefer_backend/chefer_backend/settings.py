@@ -205,4 +205,4 @@ CAPTCHA_DICTIONARY_MIN_LENGTH = 2
 CAPTCHA_DICTIONARY_MAX_LENGTH = 4
 CAPTCHA_OUTPUT_FORMAT = '%(image)s %(hidden_field)s %(text_field)s'
 CAPTCHA_FILTER_FUNCTIONS = ('captcha.helpers.post_smooth',)
-CAPTCHA_IMAGE_TEMPLATE = 'captcha/image.html'
+CAPTCHA_IMAGE_TEMPLATE = 'captcha/image.html' 
