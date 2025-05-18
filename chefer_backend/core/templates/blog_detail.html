@@ -19,6 +19,57 @@
                     <p>{{ post.content|linebreaks }}</p>
                 </div>
                 <!-- Blog Detail End -->
+
+                <!-- Comments Start -->
+                <div class="mb-5">
+                    <h3 class="mb-4">Comments ({{ comments.count }})</h3>
+                    {% for comment in comments %}
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                            <img class="rounded-circle" src="{% static 'img/user.jpg' %}" alt="" style="width: 50px; height: 50px;">
+                        </div>
+                        <div class="ms-3">
+                            <h6>{{ comment.name }} <small><i>{{ comment.created_at|date:"F d, Y" }}</i></small></h6>
+                            <p>{{ comment.content }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>No comments yet. Be the first to comment!</p>
+                    {% endfor %}
+                </div>
+                <!-- Comments End -->
+
+                <!-- Comment Form Start -->
+                <div class="bg-dark p-5">
+                    <h3 class="mb-4">Leave a comment</h3>
+                    {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-12 col-sm-6">
+                                {{ form.name }}
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                {{ form.email }}
+                            </div>
+                            <div class="col-12">
+                                {{ form.content }}
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 py-3" type="submit">Leave Your Comment</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- Comment Form End -->
             </div>
 
             <div class="col-lg-4">

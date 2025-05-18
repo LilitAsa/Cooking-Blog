@@ -13,7 +13,7 @@ from django.http import HttpResponse
 from django.views.decorators.http import require_http_methods
 from django.utils.translation import gettext_lazy as _
 from captcha.fields import CaptchaField
-from .forms import ContactForm, NewsletterForm
+from .forms import *
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 
@@ -391,12 +391,26 @@ def error_404(request):
 
 
 def blog_detail(request, pk):
-    post = BlogPost.objects.get(pk=pk)
-    
+    post = get_object_or_404(BlogPost, pk=pk)
     blog_posts = get_cached_data(BlogPost, 'blog_posts')
+    comments = post.comments.filter(is_approved=True)
+    
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.save()
+            messages.success(request, 'Your comment has been submitted and is awaiting approval.')
+            return redirect('blog_detail', pk=post.pk)
+    else:
+        form = CommentForm()
+    
     context = {
         'post': post,
         'blog_posts': blog_posts,
+        'comments': comments,
+        'form': form,
         'page_title': post.title,
     }
     return render(request, 'blog_detail.html', context)

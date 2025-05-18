@@ -9,6 +9,7 @@ admin.site.register(BlogPost)
 admin.site.register(Category)
 admin.site.register(MenuItem)
 admin.site.register(Testimonial)
+admin.site.register(Comment)
 
 @admin.register(Feature)
 class FeatureAdmin(admin.ModelAdmin):
