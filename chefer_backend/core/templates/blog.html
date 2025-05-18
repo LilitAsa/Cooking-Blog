@@ -2,31 +2,7 @@
 
 {% block content %}
     <!-- Blog Start -->
-    <div class="container-fluid p-5">
-        <div class="mb-5 text-center wow fadeIn" data-wow-delay="0.1s" style="max-width: 700px; margin: auto;">
-            <h5 class="section-title">Our Blog</h5>
-            <h1 class="display-3 mb-0">Latest Articles From Food Blog</h1>
-        </div>
-        <div class="row g-5">
-            {% for post in blog_posts %}
-            <div class="col-lg-4 col-md-6 wow fadeIn" data-wow-delay="0.{{ forloop.counter }}s">
-                <div class="blog-item">
-                    <div class="position-relative overflow-hidden rounded-top">
-                        <img class="img-fluid" src="{{ post.image.url }}" alt="{{ post.title }}">
-                    </div>
-                    <div class="bg-dark d-flex align-items-center rounded-bottom p-4">
-                        <div class="flex-shrink-0 text-center text-secondary border-end border-secondary pe-3 me-3">
-                            <span>{{ post.created_at|date:"d" }}</span>
-                            <h6 class="text-primary text-uppercase mb-0">{{ post.created_at|date:"F" }}</h6>
-                            <span>{{ post.created_at|date:"Y" }}</span>
-                        </div>
-                        <a class="h5 lh-base text-light" href="{% url 'blog_detail' post.id %}">{{ post.title }}</a>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
+    {% include "includes/blog_part.html" %}
     <!-- Blog End -->
 {% endblock %}
 

@@ -131,8 +131,9 @@ def menu(request):
 
 
 def blog(request):
+    blog_posts = get_cached_data(BlogPost, 'blog_posts')
     context = {
-        'blog_posts': get_cached_data(BlogPost, 'blog_posts', limit=3),
+        'blog_posts': blog_posts,
         'page_title': 'Blog',
     }
     return render(request, 'blog.html', context)
@@ -306,9 +307,9 @@ def contact(request) -> Any:
     
     if request.method == 'POST':
         logger.info("Received POST request to contact form")
+        form = ContactForm(request.POST)
         
         try:
-            form = ContactForm(request.POST)
             if not form.is_valid():
                 logger.warning(f"Form validation errors: {form.errors}")
                 context['error_message'] = 'Please correct the following errors:'
@@ -391,6 +392,7 @@ def error_404(request):
 
 def blog_detail(request, pk):
     post = BlogPost.objects.get(pk=pk)
+    
     blog_posts = get_cached_data(BlogPost, 'blog_posts')
     context = {
         'post': post,
@@ -446,3 +448,12 @@ def send_newsletter_view(request):
     else:
         form = NewsletterSendForm()
     return render(request, 'send_newsletter.html', {'form': form})
+
+
+def testimonials(request):
+    testimonials = get_cached_data(Testimonial, 'testimonials')
+    context = {
+        'testimonials': testimonials,
+        'page_title': 'Testimonials',
+    }
+    return render(request, 'testimonials.html', context)

@@ -258,6 +258,21 @@ h6,
     transform: scale(1.2);
 }
 
+.blog-item .bg-dark a {
+    color: #FFFFFF !important;
+    transition: color 0.3s ease;
+}
+
+.blog-item .bg-dark a:hover {
+    color: var(--bs-primary) !important;
+    text-decoration: none;
+}
+
+.blog-item a:hover {
+    color: var(--bs-primary) !important;
+    text-decoration: none;
+}
+
 .instagram img {
     transition: .5s;
 }

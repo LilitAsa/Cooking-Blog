@@ -3,13 +3,13 @@
 <div class="container-fluid menu py-5 mt-0 px-0">
   <div class="mb-5 text-center wow fadeIn" data-wow-delay="0.1s" style="max-width: 700px; margin: auto;">
       <h5 class="section-title">{{name}}</h5>
-      <h1 class="display-3 mb-0 text-white">{{description}}</h1>
+      <h1 class="display-3 mb-0 text-light">{{description}}</h1>
   </div>
   <div class="tab-class text-center m-x-auto">
       <ul class="nav nav-pills d-inline-flex justify-content-center bg-dark text-uppercase rounded-pill mb-5 wow fadeIn" data-wow-delay="0.2s">
           {% for category in categories %}
           <li class="nav-item">
-              <a class="nav-link rounded-pill text-white {% if forloop.first %}active{% endif %}" data-bs-toggle="pill" href="#tab-{{ category.id }}">{{ category.name }}</a>
+              <a class="nav-link rounded-pill text-light {% if forloop.first %}active{% endif %}" data-bs-toggle="pill" href="#tab-{{ category.id }}">{{ category.name }}</a>
           </li>
           {% endfor %}
       </ul>

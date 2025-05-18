@@ -26,9 +26,9 @@
                 <div class="mb-5">
                     <h3 class="mb-4">Recent Posts</h3>
                     {% for recent_post in blog_posts|slice:":3" %}
-                    <div class="d-flex mb-3">
+                    <div class="d-flex mb-3 blog-item">
                         <img class="img-fluid" src="{{ recent_post.image.url }}" style="width: 100px; height: 100px; object-fit: cover;" alt="{{ recent_post.title }}">
-                        <a href="{% url 'blog_detail' recent_post.id %}" class="h5 d-flex align-items-center bg-dark px-3 mb-0">{{ recent_post.title }}</a>
+                        <a href="{% url 'blog_detail' recent_post.id %}" class="h5 d-flex align-items-center bg-dark px-3 mb-0 text-light">{{ recent_post.title }}</a>
                     </div>
                     {% endfor %}
                 </div>
