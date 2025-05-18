@@ -1,3 +1,4 @@
+import hashlib
 from django.db import models
 
 class Chef(models.Model):
@@ -143,6 +144,11 @@ class Comment(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_approved = models.BooleanField(default=False)
+    
+    def get_gravatar_url(self, size=50):
+        email = self.email.strip().lower().encode('utf-8')
+        hash = hashlib.md5(email).hexdigest()
+        return f"https://www.gravatar.com/avatar/{hash}?s={size}&d=identicon"
 
     class Meta:
         ordering = ['-created_at']

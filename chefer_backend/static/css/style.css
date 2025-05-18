@@ -249,6 +249,15 @@ h6,
     width: 90px;
     height: 90px;
 }
+.blog_detail-item {
+    display: flex;
+    align-items: center;
+    background: var(--bs-dark);
+    margin-bottom: 20px;
+    border-radius: 4px;
+    overflow: hidden;
+    min-height: 100px;
+}
 
 .blog-item img {
     transition: .5s;

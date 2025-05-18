@@ -26,7 +26,7 @@
                     {% for comment in comments %}
                     <div class="d-flex mb-4">
                         <div class="flex-shrink-0">
-                            <img class="rounded-circle" src="{% static 'img/user.jpg' %}" alt="" style="width: 50px; height: 50px;">
+                            <img class="rounded-circle" src="{{ comment.get_gravatar_url }}" alt="{{ comment.name }}" style="width: 50px; height: 50px;">
                         </div>
                         <div class="ms-3">
                             <h6>{{ comment.name }} <small><i>{{ comment.created_at|date:"F d, Y" }}</i></small></h6>
@@ -77,7 +77,7 @@
                 <div class="mb-5">
                     <h3 class="mb-4">Recent Posts</h3>
                     {% for recent_post in blog_posts|slice:":3" %}
-                    <div class="d-flex mb-3 blog-item">
+                    <div class="d-flex mb-3 blog-item blog_detail-item">
                         <img class="img-fluid" src="{{ recent_post.image.url }}" style="width: 100px; height: 100px; object-fit: cover;" alt="{{ recent_post.title }}">
                         <a href="{% url 'blog_detail' recent_post.id %}" class="h5 d-flex align-items-center bg-dark px-3 mb-0 text-light">{{ recent_post.title }}</a>
                     </div>
