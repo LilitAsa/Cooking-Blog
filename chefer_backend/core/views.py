@@ -427,25 +427,12 @@ def newsletter_subscribe(request):
         form = NewsletterForm()
     return render(request, 'newsletter_form.html', {'form': form})
 
-
-def send_newsletter(subject, message, from_email=None):
-    subscribers = NewsletterSubscriber.objects.values_list('email', flat=True)
-    if not from_email:
-        from_email = 'noreply@chefer.com'  # или settings.DEFAULT_FROM_EMAIL
-    send_mail(
-        subject,
-        message,
-        from_email,
-        list(subscribers),
-        fail_silently=False,
-    )
-
 class NewsletterSendForm(forms.Form):
     subject = forms.CharField(max_length=200, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject'}))
     message = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Message', 'rows': 6}))
 
 @staff_member_required
-def send_newsletter_view(request):
+def send_newsletter(request):
     if request.method == 'POST':
         form = NewsletterSendForm(request.POST)
         if form.is_valid():

@@ -90,3 +90,15 @@ INFO 2025-05-15 17:56:21,112 views 11648 5276 User confirmation sent successfull
 INFO 2025-05-15 17:56:21,113 views 11648 5276 Emails sent successfully for message ID: 10
 INFO 2025-05-15 17:57:38,214 views 11648 17972 Received POST request to contact form
 WARNING 2025-05-15 17:57:38,234 views 11648 17972 Form validation errors: <ul class="errorlist"><li>captcha<ul class="errorlist" id="id_captcha_error"><li>Invalid security check code</li></ul></li></ul>
+INFO 2025-05-18 21:35:34,341 views 7140 2748 Received POST request to contact form
+WARNING 2025-05-18 21:35:34,403 views 7140 2748 Form validation errors: <ul class="errorlist"><li>name<ul class="errorlist" id="id_name_error"><li>This field is required.</li></ul></li><li>email<ul class="errorlist" id="id_email_error"><li>This field is required.</li></ul></li><li>subject<ul class="errorlist" id="id_subject_error"><li>This field is required.</li></ul></li><li>message<ul class="errorlist" id="id_message_error"><li>This field is required.</li></ul></li><li>captcha<ul class="errorlist" id="id_captcha_error"><li>Please complete the security check</li></ul></li></ul>
+INFO 2025-05-18 21:36:29,707 views 7140 1400 Received POST request to contact form
+WARNING 2025-05-18 21:36:29,719 views 7140 1400 Form validation errors: <ul class="errorlist"><li>captcha<ul class="errorlist" id="id_captcha_error"><li>Please complete the security check</li></ul></li></ul>
+INFO 2025-05-18 21:36:43,106 views 7140 7616 Received POST request to contact form
+INFO 2025-05-18 21:36:43,125 views 7140 7616 Form data received: {'name': 'Adam', 'email': 'a@gmail.com', 'subject': 'Subject', 'message': 'Test message'}
+INFO 2025-05-18 21:36:43,133 views 7140 7616 Message saved to database with ID: 11
+INFO 2025-05-18 21:36:43,133 views 7140 7616 Attempting to send admin notification to admin@chefer.com
+INFO 2025-05-18 21:36:43,155 views 7140 7616 Admin notification sent successfully to admin@chefer.com
+INFO 2025-05-18 21:36:43,156 views 7140 7616 Attempting to send user confirmation to a@gmail.com
+INFO 2025-05-18 21:36:43,163 views 7140 7616 User confirmation sent successfully to a@gmail.com
+INFO 2025-05-18 21:36:43,164 views 7140 7616 Emails sent successfully for message ID: 11

@@ -49,6 +49,9 @@
                         <a class="text-secondary mb-2" href="{% url 'team' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Our Chefs</a>
                         <a class="text-secondary mb-2" href="{% url 'blog' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Latest Blog</a>
                         <a class="text-secondary" href="{% url 'contact' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
+                        {% if user.is_staff %}
+                            <a class="text-primary" href="{% url 'send_newsletter' %}"><i class="bi bi-arrow-right text-primary me-2"></i>Send Newsletter</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>

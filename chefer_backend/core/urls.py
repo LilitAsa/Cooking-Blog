@@ -17,7 +17,7 @@ urlpatterns = [
     path('404/', error_404, name='error_404'),
     path('captcha/', include('captcha.urls')),
     path('newsletter/subscribe/', newsletter_subscribe, name='newsletter_subscribe'),
-    path('send-newsletter/', send_newsletter_view, name='send_newsletter'),
+    path('send-newsletter/', send_newsletter, name='send_newsletter'),
 ]
 
 handler404 = error_404
