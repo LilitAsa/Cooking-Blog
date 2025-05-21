@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    {% include "includes/feature_part.html" %}
+    
+    <!-- Dish Detail Start -->
+    <div class="container-fluid py-5">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-lg-6">
+                    <div class="position-relative wow fadeIn" data-wow-delay="0.1s">
+                        <img class="img-fluid rounded" src="{{ dish.image.url }}" alt="{{ dish.name }}">
+                        <div class="position-absolute top-0 start-0 mt-4 ms-4">
+                            {% for tag in dish.tags.all %}
+                            <a href="{% url 'dishes_by_tag' tag.name %}" class="btn btn-sm btn-primary rounded-pill">{{ tag.name }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="wow fadeIn" data-wow-delay="0.3s">
+                        <h1 class="display-4 mb-4">{{ dish.name }}</h1>
+                        <p class="mb-4">{{ dish.description }}</p>
+                        <div class="d-flex align-items-center mb-4">
+                            <h4 class="text-primary mb-0 me-3">${{ dish.price }}</h4>
+                        </div>
+                        <div class="mb-4">
+                            <h5 class="mb-3">Menu:</h5>
+                            <p class="mb-0">{{ dish.menu.name }}</p>
+                        </div>
+                        <div class="mb-4">
+                            <h5 class="mb-3">Tags:</h5>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for tag in dish.tags.all %}
+                                <a href="{% url 'dishes_by_tag' tag.name %}" class="btn btn-outline-primary rounded-pill">{{ tag.name }}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Dish Detail End -->
+{% endblock content %} 

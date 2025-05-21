@@ -13,12 +13,20 @@ admin.site.register(Category)
 admin.site.register(MenuItem)
 admin.site.register(Testimonial)
 
+
 @admin.register(Feature)
 class FeatureAdmin(admin.ModelAdmin):
     list_display = ('title', 'discount_title', 'discount')
     list_filter = ('discount_title',)
     search_fields = ('title', 'description')
     
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+    ordering = ('name',)
+
 
 @admin.register(InstagramImage)
 class InstagramImageAdmin(admin.ModelAdmin):

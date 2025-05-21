@@ -113,8 +113,29 @@ def index(request):
 
 
 def menu(request):
-    categories = get_cached_data(Category, 'categories')
+    # Get all menus for the selector
+    menus = Menu.objects.all()
+    
+    # Get selected menu from query parameter or default to first menu
+    selected_menu_id = request.GET.get('menu')
+    if selected_menu_id:
+        selected_menu = get_object_or_404(Menu, id=selected_menu_id)
+    else:
+        selected_menu = menus.first()
+    
+    # Get features for the page
     features = get_cached_data(Feature, 'features')
+    
+    # Load categories with their menu items and related dishes for the selected menu
+    categories = Category.objects.filter(
+        menu_items__dish__menu=selected_menu
+    ).distinct().prefetch_related(
+        'menu_items',
+        'menu_items__dish',
+        'menu_items__dish__tags'
+    ).order_by('name')
+    
+    # Paginate categories
     paginator = Paginator(categories, 5) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -123,9 +144,11 @@ def menu(request):
         'title': 'Menu',  
         'page_title': 'Menu',
         'name': 'Our Menu',
-        'description' : "Explore our delicious menu",
+        'description': "Explore our delicious menu",
         'categories': page_obj,
         'features': features,
+        'menus': menus,
+        'selected_menu': selected_menu,
     }
     return render(request, 'menu.html', context)
 
@@ -458,3 +481,33 @@ def testimonials(request):
         'page_title': 'Testimonials',
     }
     return render(request, 'testimonials.html', context)
+
+
+def dishes_by_tag(request, tag_slug):
+    tag = get_object_or_404(Tag, name=tag_slug)
+    dishes = Dish.objects.filter(tags=tag).select_related('menu').prefetch_related('tags')
+    features = get_cached_data(Feature, 'features')
+    
+    context = {
+        'tag': tag,
+        'dishes': dishes,
+        'features': features,
+        'page_title': f'Dishes - {tag.name}',
+        'name': f'Dishes with tag "{tag.name}"',
+        'description': 'Explore our delicious dishes',
+    }
+    return render(request, 'dishes_by_tag.html', context)
+
+
+def dish_detail(request, pk):
+    dish = get_object_or_404(Dish.objects.select_related('menu').prefetch_related('tags'), pk=pk)
+    features = get_cached_data(Feature, 'features')
+    
+    context = {
+        'dish': dish,
+        'features': features,
+        'page_title': dish.name,
+        'name': dish.name,
+        'description': dish.description,
+    }
+    return render(request, 'dish_detail.html', context)

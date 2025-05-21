@@ -18,6 +18,8 @@ urlpatterns = [
     path('captcha/', include('captcha.urls')),
     path('newsletter/subscribe/', newsletter_subscribe, name='newsletter_subscribe'),
     path('send-newsletter/', send_newsletter, name='send_newsletter'),
+    path('dishes/tag/<str:tag_slug>/', dishes_by_tag, name='dishes_by_tag'),
+    path('dish/<int:pk>/', dish_detail, name='dish_detail'),
 ]
 
 handler404 = error_404

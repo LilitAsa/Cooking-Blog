@@ -4,7 +4,19 @@
   <div class="mb-5 text-center wow fadeIn" data-wow-delay="0.1s" style="max-width: 700px; margin: auto;">
       <h5 class="section-title">{{name}}</h5>
       <h1 class="display-3 mb-0 text-light">{{description}}</h1>
+      
+      <!-- Menu Selector -->
+      <div class="mt-4">
+          <select class="form-select form-select-lg bg-dark text-light border-primary" id="menuSelector" onchange="changeMenu(this.value)">
+              {% for menu in menus %}
+              <option value="{{ menu.id }}" {% if selected_menu.id == menu.id %}selected{% endif %}>
+                  {{ menu.name }}
+              </option>
+              {% endfor %}
+          </select>
+      </div>
   </div>
+
   <div class="tab-class text-center m-x-auto">
       <ul class="nav nav-pills d-inline-flex justify-content-center bg-dark text-uppercase rounded-pill mb-5 wow fadeIn" data-wow-delay="0.2s">
           {% for category in categories %}
@@ -20,10 +32,17 @@
                   {% for item in category.menu_items.all %}
                   <div class="col-lg-3 col-md-4 col-sm-6 wow fadeIn" data-wow-delay="0.{{ forloop.counter }}s">
                       <div class="position-relative">
-                          <img class="img-fluid" src="{{ item.image.url }}" alt="{{ item.title }} style="max-width: 100%; height: auto;">
+                          <img class="img-fluid" src="{{ item.image.url }}" alt="{{ item.title }}" style="max-width: 100%; height: auto;">
                           <div class="position-absolute bottom-0 end-0 mb-4 me-4 py-1 px-3 bg-dark rounded-pill text-primary">
                               {{ item.title }} - ${{ item.price }}
                           </div>
+                          {% if item.dish %}
+                          <div class="position-absolute top-0 start-0 mt-4 ms-4">
+                              {% for tag in item.dish.tags.all %}
+                              <a href="{% url 'dishes_by_tag' tag.name %}" class="btn btn-sm btn-primary rounded-pill">{{ tag.name }}</a>
+                              {% endfor %}
+                          </div>
+                          {% endif %}
                       </div>
                   </div>
                   {% endfor %}
@@ -33,3 +52,9 @@
       </div>
   </div>
 </div>
+
+<script>
+function changeMenu(menuId) {
+    window.location.href = "{% url 'menu' %}?menu=" + menuId;
+}
+</script>
