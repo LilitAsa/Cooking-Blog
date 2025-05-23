@@ -7,10 +7,8 @@ from django.conf import settings
 
 admin.site.register(Chef)
 admin.site.register(Menu)
-admin.site.register(Dish)
 admin.site.register(BlogPost)
 admin.site.register(Category)
-admin.site.register(MenuItem)
 admin.site.register(Testimonial)
 
 
@@ -19,7 +17,21 @@ class FeatureAdmin(admin.ModelAdmin):
     list_display = ('title', 'discount_title', 'discount')
     list_filter = ('discount_title',)
     search_fields = ('title', 'description')
-    
+
+@admin.register(Dish)
+class DishAdmin(admin.ModelAdmin):
+    list_display = ('name', 'price', 'menu')
+    list_filter = ('menu',)
+    search_fields = ('name', 'description')
+    ordering = ('name',)
+    list_per_page = 10
+
+@admin.register(MenuItem)
+class MenuItemAdmin(admin.ModelAdmin):
+    list_display = ('title', 'price', 'menu', 'dish')
+    list_filter = ('menu', 'dish')
+    search_fields = ('title', 'description')
+    ordering = ('title',)
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):

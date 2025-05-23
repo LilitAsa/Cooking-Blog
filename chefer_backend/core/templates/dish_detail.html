@@ -20,8 +20,8 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="wow fadeIn" data-wow-delay="0.3s">
-                        <h1 class="display-4 mb-4">{{ dish.name }}</h1>
-                        <p class="mb-4">{{ dish.description }}</p>
+                        <h1 class="display-4 mb-4 {% if request.resolver_match.url_name == 'dish_detail' %}text-light{% else %}text-dark{% endif %}">{{ dish.name }}</h1>
+                        <p class="mb-4 ">{{ dish.description }}</p>
                         <div class="d-flex align-items-center mb-4">
                             <h4 class="text-primary mb-0 me-3">${{ dish.price }}</h4>
                         </div>

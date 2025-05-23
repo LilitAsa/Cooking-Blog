@@ -16,6 +16,7 @@ from captcha.fields import CaptchaField
 from .forms import *
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
+from django.db.models import Prefetch
 
 # Настройка логгера
 logger = logging.getLogger(__name__)
@@ -88,27 +89,57 @@ def get_cached_data(model_class, cache_key, limit=None, **kwargs):
     
     return data
   
+def get_menu_context(request):
+    menus = Menu.objects.all()
+    selected_menu_id = request.GET.get('menu')
+    selected_menu = get_object_or_404(Menu, id=selected_menu_id) if selected_menu_id else menus.first()
 
+    filtered_menu_items = Prefetch(
+        'menu_items',
+        queryset=MenuItem.objects.filter(dish__menu=selected_menu),
+        to_attr='filtered_items'
+    )
+    features = get_cached_data(Feature, 'features')
+
+    categories = Category.objects.filter(
+        menu_items__dish__menu=selected_menu
+    ).distinct().prefetch_related(
+        filtered_menu_items,
+        'menu_items__dish',
+        'menu_items__dish__tags'
+    ).order_by('name')
+
+    paginator = Paginator(categories, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return {
+        'categories': page_obj,
+        'features': features,
+        'menus': menus,
+        'selected_menu': selected_menu,
+    }
+    
 def index(request):
     features = get_cached_data(Feature, 'features')
     testimonials = get_cached_data(Testimonial, 'testimonials')
     team_members = get_cached_data(TeamMember, 'team_members')
-    menus = Menu.objects.prefetch_related('dishes').all()
     blog_posts = get_cached_data(BlogPost, 'blog_posts', limit=3)
     chefs = get_cached_data(Chef, 'chefs')
     categories = get_cached_data(Category, 'categories')
+    
+    context = get_menu_context(request)
 
-    context = {
+    context.update({
         'features': features,
         'testimonials': testimonials,
         'team_members': team_members,
-        'menus': menus,
         'blog_posts': blog_posts,
         'chefs': chefs,
         'categories': categories,
         'page_title': 'Home',
         'page_subtitle': 'Welcome to Chefer',
-    }
+    })
     return render(request, 'index.html', context)
 
 
@@ -122,7 +153,12 @@ def menu(request):
         selected_menu = get_object_or_404(Menu, id=selected_menu_id)
     else:
         selected_menu = menus.first()
-    
+        
+    filtered_menu_items = Prefetch(
+        'menu_items',
+        queryset=MenuItem.objects.filter(dish__menu=selected_menu),
+        to_attr='filtered_items'
+    )       
     # Get features for the page
     features = get_cached_data(Feature, 'features')
     
@@ -130,7 +166,7 @@ def menu(request):
     categories = Category.objects.filter(
         menu_items__dish__menu=selected_menu
     ).distinct().prefetch_related(
-        'menu_items',
+        filtered_menu_items,
         'menu_items__dish',
         'menu_items__dish__tags'
     ).order_by('name')
@@ -194,48 +230,6 @@ def about(request):
         'features': features,
     }
     return render(request, 'about.html', context)
-
-
-def validate_contact_form_data(name: str, email: str, subject: str, message: str, captcha: str) -> List[str]:
-    """
-    Валидация данных формы контактов
-    
-    Args:
-        name: Имя отправителя
-        email: Email отправителя
-        subject: Тема сообщения
-        message: Текст сообщения
-        captcha: Значение CAPTCHA
-        
-    Returns:
-        List[str]: Список ошибок валидации
-    """
-    errors = []
-    
-    if not name:
-        errors.append('Name is required')
-    elif len(name) < 2:
-        errors.append('Name must be at least 2 characters long')
-        
-    if not email:
-        errors.append('Email is required')
-    elif '@' not in email or '.' not in email:
-        errors.append('Please enter a valid email address')
-        
-    if not subject:
-        errors.append('Subject is required')
-    elif len(subject) < 5:
-        errors.append('Subject must be at least 5 characters long')
-        
-    if not message:
-        errors.append('Message is required')
-    elif len(message) < 10:
-        errors.append('Message must be at least 10 characters long')
-        
-    if not captcha:
-        errors.append('Please complete the CAPTCHA')
-        
-    return errors
 
 
 def send_contact_emails(name: str, email: str, subject: str, message: str) -> bool:
@@ -381,6 +375,7 @@ def contact(request) -> Any:
             logger.error(f"Unexpected error in contact view: {str(e)}", exc_info=True)
             context['error_message'] = ERROR_MESSAGES['save_error']
             context['form'] = form
+            return render(request, 'contact.html', context)
             
     return render(request, 'contact.html', context)
 

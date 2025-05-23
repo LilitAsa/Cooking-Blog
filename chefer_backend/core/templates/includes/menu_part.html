@@ -29,15 +29,20 @@
           {% for category in categories %}
           <div id="tab-{{ category.id }}" class="tab-pane fade {% if forloop.first %}show p-0 active{% endif %}">
               <div class="row g-0">
-                  {% for item in category.menu_items.all %}
+                {% for item in category.filtered_items %}
                   <div class="col-lg-3 col-md-4 col-sm-6 wow fadeIn" data-wow-delay="0.{{ forloop.counter }}s">
                       <div class="position-relative">
-                          <img class="img-fluid" src="{{ item.image.url }}" alt="{{ item.title }}" style="max-width: 100%; height: auto;">
+                        {% if item.image %}
+                          <img class="img-fluid object-cover" src="{{ item.image.url }}" alt="{{ item.title }}" style="max-width: 100%; height: auto;">
+                        {% else %}
+                          <img class="img-fluid object-cover" src="{{ item.dish.image.url }}" alt="{{ item.title }}" style="max-width: 100%; height: auto;">
+                        {% endif %}
                           <div class="position-absolute bottom-0 end-0 mb-4 me-4 py-1 px-3 bg-dark rounded-pill text-primary">
                               {{ item.title }} - ${{ item.price }}
                           </div>
+                          
                           {% if item.dish %}
-                          <div class="position-absolute top-0 start-0 mt-4 ms-4">
+                          <div class="position-absolute top-0 start-0 mt-4 ms-4 d-flex flex-wrap gap-2">
                               {% for tag in item.dish.tags.all %}
                               <a href="{% url 'dishes_by_tag' tag.name %}" class="btn btn-sm btn-primary rounded-pill">{{ tag.name }}</a>
                               {% endfor %}
