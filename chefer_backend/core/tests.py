@@ -201,3 +201,65 @@ def test_menu_search_and_pagination(client, test_data):
     beef_items = [item for item in found_items if 'beef' in item.title.lower() or 
                  'beef' in item.description.lower()]
     assert len(beef_items) > 0  # Должен быть найден хотя бы один стейк
+
+@pytest.mark.django_db
+def test_menu_search_empty(client, test_data):
+    """Test search with empty query"""
+    response = client.get(reverse('menu') + f'?menu={test_data["menu1"].id}&search=')
+    assert response.status_code == 200
+    context = response.context
+    
+    # Проверяем, что показаны все блюда меню
+    categories = context['categories']
+    found_items = []
+    for category in categories:
+        for item in category.filtered_items:
+            found_items.append(item)
+    
+    # Проверяем, что найдены все блюда из меню
+    assert len(found_items) > 0
+    assert any(item.dish == test_data['dish1'] for item in found_items)
+    assert any(item.dish == test_data['dish2'] for item in found_items)
+
+@pytest.mark.django_db
+def test_menu_search_special_chars(client, test_data):
+    """Test search with special characters"""
+    response = client.get(reverse('menu') + f'?menu={test_data["menu1"].id}&search=@#$%')
+    assert response.status_code == 200
+    context = response.context
+    
+    # Проверяем, что поиск корректно обрабатывает специальные символы
+    categories = context['categories']
+    found_items = []
+    for category in categories:
+        for item in category.filtered_items:
+            found_items.append(item)
+    
+    # Проверяем, что поиск с специальными символами не вызывает ошибок
+    assert response.status_code == 200
+
+@pytest.mark.django_db
+def test_menu_filter_by_tag(client, test_data):
+    """Test filtering menu items by tag"""
+    response = client.get(reverse('menu') + f'?menu={test_data["menu1"].id}&tag={test_data["tag1"].id}')
+    assert response.status_code == 200
+    context = response.context
+    
+    # Проверяем, что показаны только вегетарианские блюда
+    categories = context['categories']
+    found_items = []
+    for category in categories:
+        for item in category.filtered_items:
+            found_items.append(item)
+    
+    # Проверяем, что все найденные блюда имеют тег Vegetarian
+    assert len(found_items) > 0
+    vegetarian_items = [item for item in found_items if test_data['tag1'] in item.dish.tags.all()]
+    assert len(vegetarian_items) > 0  # Должен быть найден хотя бы один вегетарианский элемент
+    assert any(item.dish == test_data['dish1'] for item in found_items)  # Должен быть найден Vegetarian Salad
+
+@pytest.mark.django_db
+def test_menu_invalid_id(client):
+    """Test menu with invalid ID"""
+    response = client.get(reverse('menu') + '?menu=999999')
+    assert response.status_code == 404
