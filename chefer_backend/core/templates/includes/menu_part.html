@@ -31,12 +31,12 @@
               <div class="row g-0">
                 {% for item in category.filtered_items %}
                   <div class="col-lg-3 col-md-4 col-sm-6 wow fadeIn" data-wow-delay="0.{{ forloop.counter }}s">
-                      <div class="position-relative">
-                        {% if item.image %}
-                          <img class="img-fluid object-cover" src="{{ item.image.url }}" alt="{{ item.title }}" style="max-width: 100%; height: auto;">
-                        {% else %}
-                          <img class="img-fluid object-cover" src="{{ item.dish.image.url }}" alt="{{ item.title }}" style="max-width: 100%; height: auto;">
-                        {% endif %}
+                      <div class="position-relative" style="height: 300px; overflow: hidden;">
+                          {% if item.image %}
+                            <img class="img-fluid" src="{{ item.image.url }}" alt="{{ item.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                          {% else %}
+                            <img class="img-fluid" src="{{ item.dish.image.url }}" alt="{{ item.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                          {% endif %}
                           <div class="position-absolute bottom-0 end-0 mb-4 me-4 py-1 px-3 bg-dark rounded-pill text-primary">
                               {{ item.title }} - ${{ item.price }}
                           </div>
@@ -58,8 +58,33 @@
   </div>
 </div>
 
+{% if show_search %}
+<div class="container mt-4">
+  <form method="get" action="{% url 'menu' %}" class="form-inline justify-content-center">
+    <div class="input-group">
+      <input type="text" name="search" class="form-control" placeholder="Search dishes..." value="{{ request.GET.search }}">
+      <input type="hidden" name="menu" value="{{ selected_menu.id }}">
+      <div class="input-group-append">
+        <button class="btn btn-primary" type="submit">Search</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endif %}
+
 <script>
 function changeMenu(menuId) {
-    window.location.href = "{% url 'menu' %}?menu=" + menuId;
+    // Получаем текущие параметры URL
+    const params = new URLSearchParams(window.location.search);
+    // Сохраняем текущий поисковый запрос
+    const searchQuery = params.get('search');
+    // Устанавливаем новый ID меню
+    params.set('menu', menuId);
+    // Если был поисковый запрос, добавляем его обратно
+    if (searchQuery) {
+        params.set('search', searchQuery);
+    }
+    // Переходим на новую страницу с сохраненными параметрами
+    window.location.href = "{% url 'menu' %}?" + params.toString();
 }
 </script>

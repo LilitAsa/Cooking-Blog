@@ -16,7 +16,7 @@ from captcha.fields import CaptchaField
 from .forms import *
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 
 # Настройка логгера
 logger = logging.getLogger(__name__)
@@ -119,7 +119,7 @@ def get_menu_context(request):
         'menus': menus,
         'selected_menu': selected_menu,
     }
-    
+
 def index(request):
     features = get_cached_data(Feature, 'features')
     testimonials = get_cached_data(Testimonial, 'testimonials')
@@ -128,18 +128,40 @@ def index(request):
     chefs = get_cached_data(Chef, 'chefs')
     categories = get_cached_data(Category, 'categories')
     
-    context = get_menu_context(request)
+    # Добавляем данные для меню на главную страницу
+    menus = Menu.objects.all()
+    selected_menu = menus.first() # Выбираем первое меню по умолчанию
+    
+    categories_for_index_menu = Category.objects.filter(
+        menu_items__dish__menu=selected_menu
+    ).distinct().prefetch_related(
+        Prefetch('menu_items',
+                 queryset=MenuItem.objects.filter(dish__menu=selected_menu),
+                 to_attr='filtered_items'),
+        'menu_items__dish',
+        'menu_items__dish__tags'
+    ).order_by('name')
 
-    context.update({
+    # Добавляем все menu items в контекст для отображения при первичной загрузке
+    for category in categories_for_index_menu:
+        if not hasattr(category, 'filtered_items') or not category.filtered_items:
+            category.filtered_items = category.menu_items.all()
+
+    context = {
         'features': features,
         'testimonials': testimonials,
         'team_members': team_members,
         'blog_posts': blog_posts,
         'chefs': chefs,
-        'categories': categories,
+        'categories': categories_for_index_menu, # Передаем категории для отображения меню
         'page_title': 'Home',
         'page_subtitle': 'Welcome to Chefer',
-    })
+        'show_search': False, # Не показывать поиск на главной странице
+        'menus': menus, # Передаем все меню
+        'selected_menu': selected_menu, # Передаем выбранное меню
+        'name': 'Our Menu',
+        'description': "Explore our delicious menu",
+    }
     return render(request, 'index.html', context)
 
 
@@ -154,15 +176,28 @@ def menu(request):
     else:
         selected_menu = menus.first()
         
+    # Добавляем поиск блюд
+    search_query = request.GET.get('search', '')
+    
+    # Базовый queryset для menu items с учетом выбранного меню
+    menu_items_query = MenuItem.objects.filter(dish__menu=selected_menu)
+    
+    # Если есть поисковый запрос, добавляем фильтр по названию блюда или описанию
+    if search_query:
+        menu_items_query = menu_items_query.filter(
+            Q(dish__name__icontains=search_query) |
+            Q(dish__description__icontains=search_query) |
+            Q(title__icontains=search_query)
+        )
+    
+    # Создаем Prefetch объект с отфильтрованными menu items
     filtered_menu_items = Prefetch(
         'menu_items',
-        queryset=MenuItem.objects.filter(dish__menu=selected_menu),
+        queryset=menu_items_query,
         to_attr='filtered_items'
-    )       
-    # Get features for the page
-    features = get_cached_data(Feature, 'features')
+    )
     
-    # Load categories with their menu items and related dishes for the selected menu
+    # Получаем категории, которые содержат отфильтрованные menu items
     categories = Category.objects.filter(
         menu_items__dish__menu=selected_menu
     ).distinct().prefetch_related(
@@ -171,10 +206,22 @@ def menu(request):
         'menu_items__dish__tags'
     ).order_by('name')
     
-    # Paginate categories
+    # Используем order_by для явной сортировки
     paginator = Paginator(categories, 5) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+
+    # Добавляем параметры для пагинации и поиска
+    if search_query:
+        page_obj.paginator.url_template = f'?menu={selected_menu.id}&search={search_query}&page=%s'
+    else:
+        page_obj.paginator.url_template = f'?menu={selected_menu.id}&page=%s'
+    
+    # Добавляем все menu items в контекст для отображения при первичной загрузке
+    for category in page_obj:
+        if not hasattr(category, 'filtered_items') or not category.filtered_items:
+            # Фильтруем menu items только для выбранного меню
+            category.filtered_items = category.menu_items.filter(dish__menu=selected_menu)
     
     context = {
         'title': 'Menu',  
@@ -182,9 +229,11 @@ def menu(request):
         'name': 'Our Menu',
         'description': "Explore our delicious menu",
         'categories': page_obj,
-        'features': features,
+        'features': get_cached_data(Feature, 'features'),
         'menus': menus,
         'selected_menu': selected_menu,
+        'search_query': search_query,
+        'show_search': True, # Показать поиск на странице меню
     }
     return render(request, 'menu.html', context)
 
