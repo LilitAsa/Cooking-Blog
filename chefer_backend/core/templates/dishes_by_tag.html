@@ -10,26 +10,28 @@
             <h5 class="section-title">{{name}}</h5>
             <h1 class="display-3 mb-0 text-light">{{description}}</h1>
         </div>
-        <div class="row g-0">
+        <div class="row g-4">
             {% for dish in dishes %}
             <div class="col-lg-3 col-md-4 col-sm-6 wow fadeIn" data-wow-delay="0.{{ forloop.counter }}s">
-                <div class="position-relative">
-                    <a href="{% url 'dish_detail' dish.pk %}">
-                        <img class="img-fluid" src="{{ dish.image.url }}" alt="{{ dish.name }}" style="max-width: 100%; height: auto;">
-                    </a>
-                    <div class="position-absolute bottom-0 end-0 mb-4 me-4 py-1 px-3 bg-dark rounded-pill text-primary">
-                        <a href="{% url 'dish_detail' dish.pk %}" class="text-primary text-decoration-none">
-                            {{ dish.name }} - ${{ dish.price }}
+                <div class="dish-item position-relative">
+                    <div class="dish-img position-relative" style="height: 250px; overflow: hidden;">
+                        <a href="{% url 'dish_detail' dish.pk %}">
+                            <img class="img-fluid w-100 h-100" src="{{ dish.image.url }}" alt="{{ dish.name }}" style="object-fit: cover;">
                         </a>
+                        <div class="position-absolute bottom-0 end-0 mb-4 me-4 py-1 px-3 bg-dark rounded-pill text-primary">
+                            <a href="{% url 'dish_detail' dish.pk %}" class="text-primary text-decoration-none">
+                                {{ dish.name }} - ${{ dish.price }}
+                            </a>
+                        </div>
+                        <div class="position-absolute top-0 start-0 mt-4 ms-4">
+                            {% for tag in dish.tags.all %}
+                            <a href="{% url 'dishes_by_tag' tag.name %}" class="btn btn-sm btn-primary rounded-pill mb-1">{{ tag.name }}</a>
+                            {% endfor %}
+                        </div>
                     </div>
-                    <div class="position-absolute top-0 start-0 mt-4 ms-4">
-                        {% for tag in dish.tags.all %}
-                        <a href="{% url 'dishes_by_tag' tag.name %}" class="btn btn-sm btn-primary rounded-pill">{{ tag.name }}</a>
-                        {% endfor %}
+                    <div class="p-4 bg-dark h-100">
+                        <p class="text-light mb-0">{{ dish.description | truncatechars:100 }}</p>
                     </div>
-                </div>
-                <div class="p-4">
-                    <p class="text-light">{{ dish.description }}</p>
                 </div>
             </div>
             {% empty %}

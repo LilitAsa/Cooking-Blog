@@ -1,4 +1,4 @@
-# Chefer Restaurant Management System
+# Chefer - Ресторанный веб-сайт-блог
 
 ## Project Overview
 Chefer is a comprehensive restaurant management system built with Django. It provides functionality for menu management, dish categorization, and customer interactions.
