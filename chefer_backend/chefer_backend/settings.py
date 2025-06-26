@@ -136,23 +136,19 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Email settings
 if DEBUG:
-    # Для разработки используем консольный бэкенд
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 else:
-    # Для продакшена настраиваем реальный SMTP
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.gmail.com'  # или другой SMTP сервер
+    EMAIL_HOST = 'smtp.gmail.com'
     EMAIL_PORT = 587
     EMAIL_USE_TLS = True
-    EMAIL_HOST_USER = ''  # будет настроено позже
-    EMAIL_HOST_PASSWORD = ''  # будет настроено позже
+    EMAIL_HOST_USER = ''
+    EMAIL_HOST_PASSWORD = ''
 
-# Общие настройки email (работают в обоих режимах)
-DEFAULT_FROM_EMAIL = 'noreply@chefer.com'  # Email отправителя по умолчанию
-ADMIN_EMAIL = 'admin@chefer.com'  # Email администратора
-SERVER_EMAIL = 'server@chefer.com'  # Email для системных уведомлений
+DEFAULT_FROM_EMAIL = 'noreply@chefer.com'
+ADMIN_EMAIL = 'admin@chefer.com'
+SERVER_EMAIL = 'server@chefer.com'
 
 # Logging settings
 LOGGING = {
@@ -180,7 +176,7 @@ LOGGING = {
         },
     },
     'loggers': {
-        'core': {  # Это имя нашего приложения
+        'core': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': True,
@@ -188,7 +184,6 @@ LOGGING = {
     },
 }
 
-# Создаем директорию для логов, если она не существует
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)
 
 # Captcha settings

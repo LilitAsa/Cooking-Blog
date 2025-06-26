@@ -1,5 +1,6 @@
 import hashlib
 from django.db import models
+from django.contrib.auth.models import User
 
 class Chef(models.Model):
     name = models.CharField(max_length=100)
@@ -162,4 +163,4 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Comment by {self.name} on {self.post.title}'
-        
+    
